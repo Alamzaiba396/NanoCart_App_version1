@@ -31,7 +31,7 @@ const VerificationScreen = ({ navigation }) => {
     if (enteredOTP.length === 6) {
       Alert.alert("Success", "OTP Verified Successfully!", [
         {
-          text: "OK", onPress: () => navigation.navigate("Register")
+          text: "OK", onPress: () => navigation.navigate("Cart")
         },
       ]);
     } else {
@@ -77,7 +77,7 @@ const VerificationScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.bottomSection}>
-        <TouchableOpacity style={styles.continueButton}   onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity style={styles.continueButton}   onPress={() => navigation.navigate("Cart")}>
           <Text style={styles.continueText}>CONTINUE</Text>
           <Image source={require('../assets/Images/Forward.png')} style={styles.arrowIcon} />
         </TouchableOpacity>

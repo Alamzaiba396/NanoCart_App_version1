@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-
-const SubCategoryItem = ({ item }) => {
+const SubCategoryItem = ({ item, navigation }) => {
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} 
+    onPress={() => navigation.navigate('ProductDetail', { item })} >
+
       <Image source={item.image} style={styles.image} />
       <TouchableOpacity style={styles.heartIcon}>
         <Image source={require('../assets/Images/Heart.png')} style={{ width: 18, height: 18 }} />

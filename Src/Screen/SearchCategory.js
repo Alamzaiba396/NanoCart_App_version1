@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    marginTop: 20, // Add this line to push the search bar slightly down
+    marginTop: 20, 
   },
   
   backIcon: {

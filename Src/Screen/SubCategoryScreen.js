@@ -149,7 +149,7 @@ const SubCategoryScreen = ({ navigation }) => {
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <SubCategoryItem item={item} />}
+        renderItem={({ item }) => <SubCategoryItem item={item}  navigation={navigation} />}
         contentContainerStyle={styles.grid}
       />
       <View style={styles.footerButtons}>

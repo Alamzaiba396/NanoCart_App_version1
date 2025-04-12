@@ -14,7 +14,7 @@ const SplashScreen = ({ navigation }) => {
 
    
     setTimeout(() => {
-      navigation.replace("Login"); 
+      navigation.replace("Home"); 
     }, 3000);
   }, []);
 
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 100, // Adjust size based on your logo
+    width: 100, 
     height: 100,
     resizeMode: "contain",
   },
