@@ -234,48 +234,52 @@
 //   },
 // });
 
-
-
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  Image,
-  Modal,
-  ActivityIndicator,
-} from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Text, Image, Modal, ActivityIndicator } from 'react-native';
 import Header from '../Component/Header';
 import SubCategoryItem from '../Component/SubCategoryItem';
 import FilterComponent from '../Component/FilterComponent';
 import SortComponent from '../Component/SortComponent';
 
-const SubCategoryScreen = ({ navigation }) => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+const SubCategoryScreen = ({ navigation, route }) => {
+  const { subCategory } = route.params;  // ✅ Get subCategory from route
+  const subcategoryId = subCategory?._id;
+
+  const [products, setProducts] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isSortModalVisible, setSortModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const fetchItems = async () => {
-    try {
-      const response = await fetch('http://192.168.1.24:4000/api/items/subcategory/6800aed43695ce2bf2f3afd1');
-      const json = await response.json();
-      if (json.success && json.data?.items) {
-        setItems(json.data.items);
-      }
-    } catch (error) {
-      console.error('API Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const API_URL = `http://10.0.2.2:4000/api/items/subcategory/${subcategoryId}`;
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (!subcategoryId) {
+      console.error("🚫 No subcategory ID found.");
+      return;
+    }
 
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          const formatted = json.data.items.map(item => ({
+            name: item.name,
+            description: item.description,
+            mrp: item.MRP,
+            price: item.discountedPrice,
+            discount: item.discountPercentage,
+            image: { uri: item.image },
+          }));
+          setProducts(formatted);
+        } else {
+          console.log('❌ Failed to load items:', json.message);
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.log('🚫 API Error:', error);
+        setLoading(false);
+      });
+  }, [subcategoryId]);
   const openFilterModal = () => setFilterModalVisible(true);
   const closeFilterModal = () => setFilterModalVisible(false);
   const openSortModal = () => setSortModalVisible(true);
@@ -285,31 +289,17 @@ const SubCategoryScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header />
       {loading ? (
-        <ActivityIndicator size="large" color="#8e44ad" style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color="#9B5AF5" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
-          data={items}
-          keyExtractor={(item) => item._id}
+          data={products}
+          keyExtractor={(item, index) => index.toString()}
           numColumns={2}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <SubCategoryItem
-              item={{
-                name: item.name,
-                description: item.description,
-                mrp: item.MRP,
-                price: item.discountedPrice,
-                discount: item.discountPercentage,
-                image: { uri: item.image }
-              }}
-              navigation={navigation}
-            />
-          )}
+          renderItem={({ item }) => <SubCategoryItem item={item} navigation={navigation} />}
           contentContainerStyle={styles.grid}
         />
       )}
-
-      {/* Footer Buttons */}
       <View style={styles.footerButtons}>
         <TouchableOpacity style={styles.filterBtn} onPress={openFilterModal}>
           <Image source={require('../assets/Images/Filter.png')} style={styles.icon} />
@@ -321,13 +311,11 @@ const SubCategoryScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Filter Modal */}
-      <Modal animationType="slide" transparent={true} visible={isFilterModalVisible} onRequestClose={closeFilterModal}>
+      <Modal animationType="slide" transparent visible={isFilterModalVisible} onRequestClose={closeFilterModal}>
         <FilterComponent onClose={closeFilterModal} />
       </Modal>
 
-      {/* Sort Modal */}
-      <Modal animationType="slide" transparent={true} visible={isSortModalVisible} onRequestClose={closeSortModal}>
+      <Modal animationType="slide" transparent visible={isSortModalVisible} onRequestClose={closeSortModal}>
         <SortComponent onClose={closeSortModal} />
       </Modal>
     </View>
@@ -337,36 +325,49 @@ const SubCategoryScreen = ({ navigation }) => {
 export default SubCategoryScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  grid: { paddingHorizontal: 10, paddingBottom: 100 },
-  footerButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
-  },
-  filterBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#eee',
-    padding: 10,
-    borderRadius: 10,
-  },
-  sortBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#eee',
-    padding: 10,
-    borderRadius: 10,
-  },
-  icon: {
-    width: 20,
-    height: 20,
-    marginRight: 6,
-  },
-  iconText: {
-    fontWeight: 'bold',
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: '#f6f6f6',
+    },
+    grid: {
+      padding: 10,
+    },
+    footerButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingBottom: 10,
+    },
+    filterBtn: {
+      backgroundColor: '#fff',
+      padding: 10,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      width: '45%',
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    sortBtn: {
+      backgroundColor: '#fff',
+      padding: 10,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      width: '45%',
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    icon: {
+      width: 18,
+      height: 18,
+      marginRight: 6,
+      resizeMode: 'contain',
+    },
+    iconText: {
+      fontSize: 14,
+      fontWeight: '500',
+    },
+  });

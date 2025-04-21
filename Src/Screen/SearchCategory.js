@@ -154,7 +154,6 @@ const recentSearches = [
   { label: 'Cargo Pants', image: require('../assets/Images/Girl3.png') },
 ];
 
-
 const SearchCategory = () => {
   const navigation = useNavigation();
 

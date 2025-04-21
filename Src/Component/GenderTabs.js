@@ -60,7 +60,6 @@
 // });
 // export default GenderTabs;
 
-
 // import React, { useState, useEffect } from 'react';
 // import {
 //   View,
@@ -208,8 +207,10 @@ const GenderTabs = () => {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
+
+  // fetch category api here  :
   useEffect(() => {
-    fetch('http://192.168.1.24:4000/api/category')
+    fetch('http://10.0.2.2:4000/api/category')
       .then((res) => res.json())
       .then((json) => {
         if (json.success && Array.isArray(json.data)) {
@@ -223,9 +224,11 @@ const GenderTabs = () => {
       });
   }, []);
 
+
+  //  fetch the subcategory here
   const fetchSubCategories = (categoryId) => {
     setLoading(true);
-    fetch(`http://192.168.1.24:4000/api/subcategory/categories/${categoryId}`)
+    fetch(`http://10.0.2.2:4000/api/subcategory/categories/${categoryId}`)
       .then((res) => res.json())
       .then((json) => {
         if (json.success && json.data?.subCategories) {
