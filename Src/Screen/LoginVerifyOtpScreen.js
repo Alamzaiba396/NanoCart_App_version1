@@ -5,13 +5,12 @@ import { setAuthToken } from "../redux/reducers/authReducer";
 
 const screenWidth = Dimensions.get('window').width;
 
-  const VerificationScreen = ({ route,navigation }) => {
+  const LoginVerifyOtpScreen = ({ route,navigation }) => {
     
   const dispatch = useDispatch();
 
-    const { name, email, phone } = route.params;
-    console.log("Name:", name);
-    console.log("Email:", email);
+    const {  phone } = route.params;
+    
     console.log("Phone:", phone);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
@@ -39,68 +38,6 @@ const screenWidth = Dimensions.get('window').width;
     console.log("Route params at OTP screen:", route?.params);
   }, []);
 
-  // const handleVerifyOTP = async () => {
-  //   const enteredOTP = otp.join("");
-  
-  //   if (enteredOTP.length !== 6) {
-  //     Alert.alert("Error", "Please enter a valid 6-digit OTP.");
-  //     return;
-  //   }
-  
-  //   const { name, email, phone } = route.params; // Use name, email, and phone from route.params
-  
-  //   try {
-  //     console.log("Verifying OTP with:", { phoneNumber: phone, otp: enteredOTP });
-  
-  //     const verifyResponse = await fetch("http://10.0.2.2:4000/api/auth/otp/verify", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         phoneNumber: phone,
-  //         otp: enteredOTP,
-  //       }),
-  //     });
-  
-  //     const verifyData = await verifyResponse.json();
-  //     console.log("OTP Verify Response:", verifyData);
-  
-  //     if (verifyResponse.ok && verifyData.success) {
-  //       // Proceed with signup
-  //       const signupResponse = await fetch("http://10.0.2.2:4000/api/auth/signup", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           name:name, 
-  //           phoneNumber: phone, 
-  //           email:email,
-  //         }),
-  //       });
-  
-  //       const signupData = await signupResponse.json();
-  
-  //       if (signupResponse.ok && signupData.success) {
-  //         Alert.alert("Success", "Signup successful!", [
-  //           { text: "OK", onPress: () => navigation.navigate("Cart") },
-  //         ]);
-  //       } else {
-  //         Alert.alert("Signup Failed", signupData.message || "Something went wrong during signup.");
-  //       }
-  //     } else if (verifyData.message === "OTP expired") {
-  //       Alert.alert("Error", "Your OTP has expired. Please request a new one.");
-  //     } else {
-  //       Alert.alert("OTP Verification Failed", verifyData.message || "Invalid OTP.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     Alert.alert("Error", "Something went wrong. Please try again.");
-  //   }
-  // };
-  
-
   const handleVerifyOTP = async () => {
     const enteredOTP = otp.join("");
     if (enteredOTP.length !== 6) {
@@ -108,7 +45,7 @@ const screenWidth = Dimensions.get('window').width;
       return;
     }
     
-    const { name, email, phone } = route.params;
+    const {  phone } = route.params;
     try {
       console.log("Verifying OTP with:", { phoneNumber: phone, otp: enteredOTP });
   
@@ -122,40 +59,38 @@ const screenWidth = Dimensions.get('window').width;
           otp: enteredOTP,
         }),
       });
-  
+
       const verifyData = await verifyResponse.json();
       console.log("OTP Verify Response:", verifyData);
   
       if (verifyResponse.ok && verifyData.success) {
         // OTP verified, now signup
-        const signupResponse = await fetch("http://10.0.2.2:4000/api/auth/signup", {
+        const loginResponse = await fetch("http://10.0.2.2:4000/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name,
-            phoneNumber: phone,
-            email,
+          phoneNumber: phone,
+          otp: enteredOTP,
           }),
         });
+        const loginData = await loginResponse.json();
+        console.log("login API Response:", loginData);
   
-        const signupData = await signupResponse.json();
-        console.log("Signup API Response:", signupData);
-  
-        if (signupResponse.ok && signupData.success) {
-          const token = signupData.data.token;
+        if (loginResponse.ok && loginData.success) {
+          const token = loginData.data.token;
   
           // ✅ Store token in Redux
-          dispatch(setAuthToken({ token, user: { name, email, phoneNumber: phone } }));
+          dispatch(setAuthToken({ token, user: { phoneNumber: phone } }));
   
-          console.log("✅ Signup successful. Token stored in Redux:", token);
+          console.log("✅ login successful. Token stored in Redux:", token);
   
-          Alert.alert("Success", "Signup successful!", [
+          Alert.alert("Success", "login successful!", [
             { text: "OK", onPress: () => navigation.navigate("Cart") },
           ]);
         } else {
-          Alert.alert("Signup Failed", signupData.message || "Something went wrong during signup.");
+          Alert.alert("Signup Failed", loginData.message || "Something went wrong during signup.");
         }
       } else if (verifyData.message === "OTP expired") {
         Alert.alert("Error", "Your OTP has expired. Please request a new one.");
@@ -224,7 +159,7 @@ const screenWidth = Dimensions.get('window').width;
   );
 };
 
-export default VerificationScreen;
+export default LoginVerifyOtpScreen;
 
 const styles = StyleSheet.create({
   container: {

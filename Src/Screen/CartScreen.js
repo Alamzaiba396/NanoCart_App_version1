@@ -7,13 +7,17 @@ import {
   ScrollView,
   StyleSheet,
   Modal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import Icon from 'react-native-vector-icons/Ionicons';
-const CartScreen = ({navigation}) => {
+import { useSelector } from 'react-redux';
+
+const CartScreen = ({ navigation }) => {
   const [quantities, setQuantities] = useState([1, 1]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const authToken = useSelector((state) => state.auth.token);
+
 
   const handleIncrease = (index) => {
     const newQuantities = [...quantities];
@@ -34,9 +38,26 @@ const CartScreen = ({navigation}) => {
   };
 
   const handleLoginPress = () => {
-    closeModal(); 
-    navigation.navigate('Login'); 
+    closeModal(); // Close the modal
+    navigation.navigate('Login'); // Navigate to Login screen
   };
+
+  // const handleContinuePress = () => {
+  //   setIsModalVisible(true); // Open the login modal when CONTINUE is pressed
+  // };
+
+
+  const handleContinuePress = () => {
+    if (authToken) {
+      // User is logged in, navigate to Delivery screen
+      navigation.navigate('Delivery');
+    } else {
+      // User not logged in, show modal
+      setIsModalVisible(true);
+    }
+  };
+  
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView
@@ -57,7 +78,7 @@ const CartScreen = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: 10
+            marginBottom: 10,
           }}
         >
           <Text style={{ fontWeight: 'bold', color: '#F36F25' }}>● CART DETAILS</Text>
@@ -69,7 +90,10 @@ const CartScreen = ({navigation}) => {
 
         {/* Product Cards */}
         {[0, 1].map((index) => (
-          <View key={index} style={{ backgroundColor: '#fff', padding: 15, marginVertical: 5 }}>
+          <View
+            key={index}
+            style={{ backgroundColor: '#fff', padding: 15, marginVertical: 5 }}
+          >
             <View style={{ flexDirection: 'row' }}>
               <Image
                 source={
@@ -90,7 +114,7 @@ const CartScreen = ({navigation}) => {
                     style={{
                       backgroundColor: '#F6B684',
                       paddingHorizontal: 6,
-                      marginHorizontal: 5
+                      marginHorizontal: 5,
                     }}
                     onPress={() => handleDecrease(index)}
                   >
@@ -101,7 +125,7 @@ const CartScreen = ({navigation}) => {
                     style={{
                       backgroundColor: '#F6B684',
                       paddingHorizontal: 6,
-                      marginHorizontal: 5
+                      marginHorizontal: 5,
                     }}
                     onPress={() => handleIncrease(index)}
                   >
@@ -112,7 +136,7 @@ const CartScreen = ({navigation}) => {
                   style={{
                     textDecorationLine: 'line-through',
                     color: '#888',
-                    marginTop: 5
+                    marginTop: 5,
                   }}
                 >
                   ₹1499.00
@@ -130,7 +154,7 @@ const CartScreen = ({navigation}) => {
                   borderWidth: 1,
                   marginRight: 5,
                   padding: 8,
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
               >
                 <Text style={{ color: '#F36F25' }}>MOVE TO WISHLIST</Text>
@@ -142,7 +166,7 @@ const CartScreen = ({navigation}) => {
                   borderWidth: 1,
                   marginLeft: 5,
                   padding: 8,
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
               >
                 <Text style={{ color: '#F36F25' }}>REMOVE</Text>
@@ -160,7 +184,7 @@ const CartScreen = ({navigation}) => {
             padding: 10,
             borderRadius: 5,
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }}
         >
           <Text>Apply Coupon</Text>
@@ -173,7 +197,7 @@ const CartScreen = ({navigation}) => {
             marginHorizontal: 15,
             padding: 10,
             backgroundColor: '#FFF8F5',
-            borderRadius: 8
+            borderRadius: 8,
           }}
         >
           <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>
@@ -207,11 +231,9 @@ const CartScreen = ({navigation}) => {
             backgroundColor: '#F36F25',
             padding: 15,
             margin: 15,
-            borderRadius: 5
+            borderRadius: 5,
           }}
-onPress={() => navigation.navigate('Delivery')}
-
-          // onPress={() => setIsModalVisible(true)}
+          onPress={handleContinuePress} // Trigger modal on CONTINUE press
         >
           <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
             CONTINUE
@@ -224,38 +246,38 @@ onPress={() => navigation.navigate('Delivery')}
         </Text>
       </ScrollView>
 
-    <Modal 
-      visible={isModalVisible} 
-      transparent 
-      animationType="fade" 
-      onRequestClose={closeModal}>
-      <TouchableWithoutFeedback onPress={closeModal}>
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.modalContent}>
-              
-              {/* Cross Icon */}
-              <TouchableOpacity onPress={closeModal} style={styles.closeIcon}>
-                <Icon name="close" size={24} color="#000" />
-              </TouchableOpacity>
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                {/* Cross Icon */}
+                <TouchableOpacity onPress={closeModal} style={styles.closeIcon}>
+                  <Icon name="close" size={24} color="#000" />
+                </TouchableOpacity>
 
-              <Text style={styles.modalTitle}>Uh-oh!</Text>
-              <Text style={styles.modalMessage}>
-                Looks like you haven't logged in!
-              </Text>
+                <Text style={styles.modalTitle}>Uh-oh!</Text>
+                <Text style={styles.modalMessage}>
+                  Looks like you haven't logged in!
+                </Text>
 
-              <TouchableOpacity style={styles.modalButton} onPress={handleLoginPress}>
-                <Text style={styles.modalButtonText}>LOGIN TO CONTINUE</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={handleLoginPress}>
+                  <Text style={styles.modalButtonText}>LOGIN TO CONTINUE</Text>
+                </TouchableOpacity>
 
-              <Text style={styles.modalHelpText}>
-                Having trouble logging in? Whatsapp Us
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+                <Text style={styles.modalHelpText}>
+                  Having trouble logging in? Whatsapp Us
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -266,7 +288,7 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4
+    marginBottom: 4,
   },
   modalOverlay: {
     flex: 1,

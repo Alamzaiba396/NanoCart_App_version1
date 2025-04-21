@@ -30,8 +30,9 @@ const Header = () => {
 
           {/* Search Icon */}
           <TouchableOpacity
-            style={{ marginHorizontal: 6 }}
-            onPress={() => navigation.navigate('Search')} >
+            style={{ marginRight: 20 }} // Increased space between search and cart
+            onPress={() => navigation.navigate('Search')}
+          >
             <Image
               source={require('../assets/Images/SearchIcon.png')}
               style={{ width: 20, height: 20, resizeMode: 'contain' }}
@@ -39,7 +40,7 @@ const Header = () => {
           </TouchableOpacity>
 
           {/* Cart Icon */}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
             <Image
               source={require('../assets/Images/Cart.png')}
               style={{ width: 22, height: 22, resizeMode: 'contain' }}

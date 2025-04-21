@@ -13,11 +13,13 @@ import Feather from 'react-native-vector-icons/Feather';
 import Header from '../Component/Header';
 import AccordionItem from '../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon1 from 'react-native-vector-icons/AntDesign';
+
 import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
-const ProductDetail = () => {
+const PartnerCatalogueScreen = () => {
   const navigation = useNavigation();
 
   const images = [
@@ -109,13 +111,15 @@ const ProductDetail = () => {
         <View style={styles.colorsRow}>
           <Text style={styles.colorsText}>Colors</Text>
           <View style={styles.shareContainer}>
-            <Text style={styles.shareText}>SHARE</Text>
-            <Feather
-              name="share-2"
-              size={16}
-              color="black"
-              style={{marginLeft: 5}}
-            />
+            <Text style={styles.shareText}>
+              Catalogue{' '}
+              <Icon1
+                name="<DownloadOutlined />"
+                size={16}
+                color="#fff"
+                style={{marginLeft: 20}}
+              />
+            </Text>
           </View>
         </View>
 
@@ -295,7 +299,7 @@ const ProductDetail = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.wishlistButton}
-            onPress={() => navigation.navigate('Wishlist')}>
+            onPress={() => navigation.navigate('wishlist')}>
             <Icon
               name="heart"
               size={16}
@@ -323,7 +327,7 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail;
+export default PartnerCatalogueScreen;
 
 const styles = StyleSheet.create({
   priceSizeSection: {
@@ -676,4 +680,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-

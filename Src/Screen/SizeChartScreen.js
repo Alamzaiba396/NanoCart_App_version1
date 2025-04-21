@@ -111,7 +111,7 @@ const SizeChartScreen = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.wishlistButton}>
+        <TouchableOpacity onPress={()=>navigation.navigate('Wishlist')} style={styles.wishlistButton}>
           <Icon name="heart" size={16} color="#F57C00" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>WISHLIST</Text>
         </TouchableOpacity>

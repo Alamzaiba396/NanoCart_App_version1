@@ -12,10 +12,50 @@ import { useNavigation } from "@react-navigation/native";
 
 const backIcon = require("../assets/Images/Backward.png");
 const forwardIcon = require("../assets/Images/Forward.png");
-
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState("");
+
+  const handleContinue = async () => {
+    console.log('continue button pressed');
+    
+    if (!phone || phone.length < 10) {
+      console.log('Phone number is invalid:', phone);
+      Alert.alert('Error', 'Please enter a valid phone number');
+      return;
+    }
+    console.log('Phone number is valid:', phone);
+    try {
+      console.log('Sending POST request to API...');
+      const response = await fetch('http://10.0.2.2:4000/api/auth/otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: phone,
+        }),
+      });
+      console.log('loginnnnn:', response.status);
+      const data = await response.json();
+      console.log('Response JSON:', data);
+  
+      if (response.ok) {
+        console.log('OTP request successful');
+        navigation.navigate('LoginVerifyOtp', {
+         
+          phone,
+        });
+      } else {
+        console.log('Server responded with error:', data.message);
+        Alert.alert('OTP Failed', data.message || 'Something went wrong');
+      }
+    } catch (error) {
+      console.log('Network Error caught:', error.message); 
+      console.log('Full error:', error);
+      Alert.alert('Network Error', 'Unable to send OTP');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -53,16 +93,19 @@ const LoginScreen = () => {
       {/* Fixed Bottom Section */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("VerifyOtp")}
-          style={styles.button}
-        >
+         onPress={handleContinue}
+          style={styles.button} >
           <Text style={styles.buttonText}>CONTINUE</Text>
           <Image source={forwardIcon} style={[styles.icon, styles.forwardIcon]} />
         </TouchableOpacity>
+        
+    <View style={styles.row}>
+      <Text style={styles.supportText}>Having trouble logging in? </Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.whatsappText}>Register</Text>
+      </TouchableOpacity>
+    </View>
 
-        <Text style={styles.supportText}>
-          Having trouble logging in? <Text style={styles.whatsappText}>Whatsapp Us</Text>
-        </Text>
       </View>
     </View>
   );
@@ -129,7 +172,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   bottomContainer: {
-    paddingBottom: 30, // Ensure spacing from the bottom
+    paddingBottom: 30, 
   },
   button: {
     flexDirection: "row",
@@ -138,21 +181,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 14,
     borderRadius: 5,
-    marginBottom: 15, // Space above support text
+    marginBottom: 15, 
   },
   buttonText: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "bold",
   },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center', 
+  },
   supportText: {
-    fontSize: 12,
-    color: "#707070",
-    textAlign: "center",
+    color: '#333',
+    fontSize: 14,
   },
   whatsappText: {
-    color: "#D67D3E",
-    fontWeight: "500",
+    color: '#D6722F', 
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from 'react-native';
 import HomeScreen from '../Screen/HomeScreen';
 import WishlistScreen from '../Screen/WishlistScreen';
-import AccountScreen from '../Screen/AccountScreen';
+import MyAccountScreen from '../Screen/MyAccountScreen';
 
  const homeIcon = require('../assets/Images/HOME.png');
  const wishlistIcon = require('../assets/Images/Wishlist.png');
@@ -52,8 +52,7 @@ const BottomTabBar = () => {
       })}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="wishlist" component={WishlistScreen} />
-      <Tab.Screen name="Account" component={AccountScreen} />
-      
+      <Tab.Screen name="Account" component={MyAccountScreen} />
     </Tab.Navigator>
   );
 };

@@ -1,10 +1,26 @@
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
 
 const CategoryGrid = ({ data, onItemPress }) => {
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() => onItemPress(item)}>
-      <Image source={item.image} style={styles.image} />
-      <Text style={styles.label}>{item.label}</Text>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => onItemPress(item)}
+    >
+      <Image
+        source={{ uri: item.image }} // Access the image URL from the API response
+        style={styles.itemImage}
+        resizeMode="cover"
+      />
+      <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
@@ -12,8 +28,9 @@ const CategoryGrid = ({ data, onItemPress }) => {
     <FlatList
       data={data}
       renderItem={renderItem}
-      numColumns={3}
-      keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item) => item._id}
+      numColumns={2}
+      columnWrapperStyle={styles.row}
       contentContainerStyle={styles.grid}
     />
   );
@@ -23,20 +40,25 @@ const styles = StyleSheet.create({
   grid: {
     padding: 10,
   },
+  row: {
+    justifyContent: 'space-between',
+  },
   itemContainer: {
-    flex: 1,
-    margin: 8,
+    width: '48%',
+    marginBottom: 15,
     alignItems: 'center',
   },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
+  itemImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
   },
-  label: {
+  itemText: {
     marginTop: 5,
     fontSize: 14,
+    fontWeight: '500',
     textAlign: 'center',
+    color: '#333',
   },
 });
 

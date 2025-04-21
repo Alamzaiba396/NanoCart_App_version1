@@ -18,7 +18,7 @@ const DeliveryAddressScreen = ({ navigation }) => {
       setModalVisible(true);
       setHasShownModal(true);
     } else {
-      navigation.navigate('PaymentScreen'); 
+      navigation.navigate('Payment');
     }
   };
 
@@ -38,9 +38,25 @@ const DeliveryAddressScreen = ({ navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Deliver to Section */}
+        <View style={styles.deliverToContainer}>
+          {/* <Text style={styles.deliverToText}>Deliver to</Text> */}
+          <View style={styles.deliverToDetails}>
+            <Text style={styles.deliverToName}>Anuradha Sharma</Text>
+            <Text style={styles.deliverToAddress}>Anjurad, 724026</Text>
+            <Text style={styles.deliverToAddress}>Gujrat,742025</Text>
+          </View>
+          <TouchableOpacity onPress={()=>navigation.navigate('edit')}  style={styles.changeButton}>
+            <Text style={styles.changeText}>CHANGE</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Add Address Button */}
-        <TouchableOpacity style={styles.addAddressBtn}>
-          <Text style={styles.addAddressText}>ADD NEW ADDRESS</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('AddNewAddress')}
+          style={styles.addAddressBtn}
+        >
+          <Text style={styles.addAddressText}>ADD  ADDRESS</Text>
         </TouchableOpacity>
 
         {/* Price Details */}
@@ -73,7 +89,8 @@ const DeliveryAddressScreen = ({ navigation }) => {
 
           <View style={styles.savingBox}>
             <Text style={styles.savingText}>
-              Hooray! You are saving <Text style={styles.highlight}>₹1049/-</Text> with this order!
+              Hooray! You are saving{' '}
+              <Text style={styles.highlight}>₹1049/-</Text> with this order!
             </Text>
           </View>
         </View>
@@ -87,7 +104,7 @@ const DeliveryAddressScreen = ({ navigation }) => {
 
       {/* Continue Button */}
       <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-        <Text style={styles.continueText}>CONTINUE</Text>
+        <Text style={styles.continueText}>CONTINUE To PAYMENT</Text>
       </TouchableOpacity>
 
       {/* Modal */}
@@ -95,13 +112,17 @@ const DeliveryAddressScreen = ({ navigation }) => {
         visible={modalVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setModalVisible(false)} >
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <Text style={styles.modalText}>This is a one-time message before proceeding.</Text>
+            <Text style={styles.modalText}>
+              This is a one-time message before proceeding.
+            </Text>
             <TouchableOpacity
               style={styles.modalBtn}
-              onPress={() => setModalVisible(false)} >
+              onPress={() => setModalVisible(false)}
+            >
               <Text style={styles.modalBtnText}>Got it</Text>
             </TouchableOpacity>
           </View>
@@ -112,6 +133,7 @@ const DeliveryAddressScreen = ({ navigation }) => {
 };
 
 export default DeliveryAddressScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -123,6 +145,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
+    marginTop:20,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 10,
@@ -144,6 +167,43 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
     paddingBottom: 80,
+  },
+  deliverToContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    marginBottom: 16,
+  },
+  deliverToText: {
+    fontSize: 14,
+    color: '#333',
+    marginRight: 10,
+  },
+  deliverToDetails: {
+    flex: 1,
+  },
+  deliverToName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  deliverToAddress: {
+    fontSize: 12,
+    color: '#666',
+  },
+  changeButton: {
+    backgroundColor: '#f37022',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+  },
+  changeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   addAddressBtn: {
     backgroundColor: '#f37022',

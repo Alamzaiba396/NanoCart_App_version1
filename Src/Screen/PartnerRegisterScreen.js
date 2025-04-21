@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -14,8 +14,9 @@ import {
 } from 'react-native';
 import BackIcon from '../assets/Images/Backward.png';
 import ForwardIcon from '../assets/Images/Forward.png';
+import Icon from 'react-native-vector-icons/AntDesign';
 
-const CustomCheckbox = ({ value, onValueChange }) => {
+const CustomCheckbox = ({value, onValueChange}) => {
   return (
     <TouchableOpacity
       style={styles.checkboxBase}
@@ -25,59 +26,20 @@ const CustomCheckbox = ({ value, onValueChange }) => {
   );
 };
 
-const RegisterScreen = ({ navigation }) => {
+const PartnerRegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [phone, setPhone] = useState('');
-  const [isEditingPhone, setIsEditingPhone] = useState(false);
-  
-  const handleRegister = async () => {
-    console.log('Register button pressed');
-    
-    if (!phone || phone.length < 10) {
-      console.log('Phone number is invalid:', phone);
-      Alert.alert('Error', 'Please enter a valid phone number');
-      return;
-    }
-    console.log('Phone number is valid:', phone);
-    try {
-      console.log('Sending POST request to API...');
-      const response = await fetch('http://10.0.2.2:4000/api/auth/otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phoneNumber: phone,
-        }),
-      });
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response JSON:', data);
-  
-      if (response.ok) {
-        console.log('OTP request successful');
-        navigation.navigate('VerifyOtp', {
-          name,
-          email,
-          phone,
-        });
-      } else {
-        console.log('Server responded with error:', data.message);
-        Alert.alert('OTP Failed', data.message || 'Something went wrong');
-      }
-    } catch (error) {
-      console.log('Network Error caught:', error.message); 
-      console.log('Full error:', error);
-      Alert.alert('Network Error', 'Unable to send OTP');
-    }
-  };
-  
+  const [shopname, setShopname] = useState('');
+  const [gst, setGst] = useState('');
+  const [pan, setPan] = useState('');
+  const [shopaddress, setShopaddress] = useState('');
+  const [pincode, setPincode] = useState('');
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.backButtonWrapper}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -85,7 +47,7 @@ const RegisterScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ flex: 1 }}>
+        <View style={{flex: 1}}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
               <Text style={styles.title}>Register</Text>
@@ -99,21 +61,8 @@ const RegisterScreen = ({ navigation }) => {
                 onChangeText={setName}
               />
 
-{isEditingPhone ? (
-  <TextInput
-    style={styles.input}
-    placeholder="Phone Number*"
-    placeholderTextColor="#aaa"
-    value={phone}
-    onChangeText={setPhone}
-    keyboardType="phone-pad"
-    autoFocus
-  />
-) : (
-  <TouchableOpacity onPress={() => setIsEditingPhone(true)}>
-    <Text style={styles.staticPhone}>{phone ? `+91 – ${phone}` : '+91 – 6370100190'}</Text>
-  </TouchableOpacity>
-)}
+              <Text style={styles.staticPhone}>+91 – 6370100190</Text>
+
               <TextInput
                 style={styles.input}
                 placeholder="E-mail ID*"
@@ -122,31 +71,88 @@ const RegisterScreen = ({ navigation }) => {
                 onChangeText={setEmail}
                 keyboardType="email-address"
               />
+
               <View style={styles.checkboxContainer}>
                 <CustomCheckbox
                   value={isSubscribed}
                   onValueChange={setIsSubscribed}
                 />
-                <Text style={styles.checkboxText}>Email me for offers and updates.</Text>
+                <Text style={styles.checkboxText}>
+                  Email me for offers and updates.
+                </Text>
               </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Shop Name*"
+                placeholderTextColor="#aaa"
+                value={shopname}
+                onChangeText={setShopname}
+              />
+              <View style={styles.requiredNo}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="GST No.*"
+                  placeholderTextColor="#aaa"
+                  value={gst}
+                  onChangeText={setGst}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="PAN No.*"
+                  placeholderTextColor="#aaa"
+                  value={pan}
+                  onChangeText={setPan}
+                />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Shop Address*"
+                placeholderTextColor="#aaa"
+                value={shopaddress}
+                onChangeText={setShopaddress}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Pincode"
+                placeholderTextColor="#aaa"
+                value={pincode}
+                onChangeText={setPincode}
+              />
             </View>
           </ScrollView>
 
           {/* Button at the bottom */}
           <View style={styles.bottomSection}>
-          <TouchableOpacity 
-          style={styles.registerButton} 
-          onPress={handleRegister}>
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() => navigation.navigate('PartnerVerification')}>
+              <View style={styles.registerContent}>
+                <Text style={styles.registerText}>REGISTER</Text>
+                <Image source={ForwardIcon} style={styles.forwardIcon} />
+              </View>
+            </TouchableOpacity>
 
-  <View style={styles.registerContent}>
-    <Text style={styles.registerText}>REGISTER</Text>
-    <Image source={ForwardIcon} style={styles.forwardIcon} />
-  </View>
-          </TouchableOpacity>
             <Text style={styles.footerText}>
               Having trouble logging in?{' '}
               <Text style={styles.whatsappText}>Whatsapp Us</Text>
             </Text>
+          </View>
+
+          <View style={styles.uploadContainer}>
+            <Text style={styles.label}>
+              Shop Image<Text style={{color: '#F4A261'}}>*</Text>
+            </Text>
+            <TouchableOpacity style={styles.uploadButton}>
+              <Text style={styles.buttonText}>
+                Upload
+                <Icon
+                  name="upload"
+                  size={16}
+                  color="#fff"
+                  style={{marginLeft: 20}}
+                />
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -154,12 +160,26 @@ const RegisterScreen = ({ navigation }) => {
   );
 };
 
-export default RegisterScreen;
+export default PartnerRegisterScreen;
 
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: 20,
   },
+  label: {
+    color: '#757575',
+    fontSize: 16,
+  },
+  uploadButton: {
+    backgroundColor: '#D86427',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+
   container: {
     padding: 25,
     paddingTop: 80,
@@ -226,6 +246,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#D86427',
     borderRadius: 2,
   },
+  requiredNo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   bottomSection: {
     padding: 25,
     borderTopWidth: 1,
@@ -263,5 +288,16 @@ const styles = StyleSheet.create({
   whatsappText: {
     color: '#D86427',
     fontWeight: '600',
+  },
+  uploadButton: {
+    backgroundColor: '#F28C38',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  uploadContainer: {
+    padding: 25,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
