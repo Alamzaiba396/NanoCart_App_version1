@@ -243,11 +243,15 @@ const GenderTabs = () => {
       });
   };
 
+
+  // for category tab press
   const handleTabPress = (categoryId) => {
     setActiveTab(categoryId);
     fetchSubCategories(categoryId);
   };
 
+
+  // for subcategory item press
   const handleItemPress = (item) => {
     navigation.navigate('SubCategory', { subCategory: item });
   };

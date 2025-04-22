@@ -250,36 +250,51 @@ const SubCategoryScreen = ({ navigation, route }) => {
   const [isSortModalVisible, setSortModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
+
+  //  fetch  the item list from the API
   const API_URL = `http://10.0.2.2:4000/api/items/subcategory/${subcategoryId}`;
+
+
+
   useEffect(() => {
     if (!subcategoryId) {
-      console.error("🚫 No subcategory ID found.");
+      console.error(" No subcategory ID found.");
       return;
     }
-
+  
+    const API_URL = `http://10.0.2.2:4000/api/items/subcategory/${subcategoryId}`;
+    console.log(' Fetching Subcategory Items from:', API_URL);
+  
     fetch(API_URL)
       .then(res => res.json())
       .then(json => {
         if (json.success) {
-          const formatted = json.data.items.map(item => ({
-            name: item.name,
-            description: item.description,
-            mrp: item.MRP,
-            price: item.discountedPrice,
-            discount: item.discountPercentage,
-            image: { uri: item.image },
-          }));
+          const formatted = json.data.items.map(item => {
+            console.log(' Item ID:', item._id);  // ✅ LOG EACH ITEM ID
+            return {
+              name: item.name,
+              description: item.description,
+              mrp: item.MRP,
+              price: item.discountedPrice,
+              discount: item.discountPercentage,
+              image: { uri: item.image },
+              itemId: item._id,
+            };
+          });
           setProducts(formatted);
         } else {
-          console.log('❌ Failed to load items:', json.message);
+          console.log(' Failed to load items:', json.message);
         }
         setLoading(false);
       })
       .catch(error => {
-        console.log('🚫 API Error:', error);
+        console.log(' API Error:', error);
         setLoading(false);
       });
   }, [subcategoryId]);
+  
+
+
   const openFilterModal = () => setFilterModalVisible(true);
   const closeFilterModal = () => setFilterModalVisible(false);
   const openSortModal = () => setSortModalVisible(true);
@@ -296,7 +311,7 @@ const SubCategoryScreen = ({ navigation, route }) => {
           keyExtractor={(item, index) => index.toString()}
           numColumns={2}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => <SubCategoryItem item={item} navigation={navigation} />}
+          renderItem={({ item }) => <SubCategoryItem item={item}  itemId={item.itemId}  navigation={navigation} />}
           contentContainerStyle={styles.grid}
         />
       )}

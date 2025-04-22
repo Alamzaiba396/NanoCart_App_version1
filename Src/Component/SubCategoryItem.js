@@ -1,9 +1,16 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-const SubCategoryItem = ({ item, navigation }) => {
+const SubCategoryItem = ({ item, navigation,itemId }) => {
+
+  console.log('👉 Received itemId in SubCategoryItem:', itemId);
+  
   return (
-    <TouchableOpacity style={styles.card} 
-    onPress={() => navigation.navigate('ProductDetail', { item })} >
+    <TouchableOpacity
+     style={styles.card}
+     onPress={() => {
+      console.log(' Navigating with itemId:', item.itemId);  
+      navigation.navigate('ProductDetail', { itemId: item.itemId });
+  }}>
 
       <Image source={item.image} style={styles.image} />
       <TouchableOpacity style={styles.heartIcon}>

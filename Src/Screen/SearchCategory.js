@@ -186,6 +186,8 @@ const SearchCategory = () => {
 
       {/* Popular Categories */}
       <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Popular Categories</Text>
+     
+     
       <GenderTabs /> 
 
       <SuggestionCard
