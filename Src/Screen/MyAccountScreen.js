@@ -28,7 +28,9 @@ const MyAccountScreen = ({navigation}) => {
           onPress={() => navigation.navigate('Profile')}>
           <Text style={styles.menuText}>Profile</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('OrderConfirmation')}>
           <Text style={styles.menuText}>Order History</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>

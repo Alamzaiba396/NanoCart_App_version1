@@ -8,14 +8,39 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Make sure this package is installed
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const SubCategoryItem = ({item, navigation, itemId, authToken}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [returnScreen, setReturnScreen] = useState(null);
 
-  const handleContinuePress = () => {
+  const addToWishList = async () => {
+    try {
+      const response = await fetch(
+        'http://localhost:4000/api/userwishlist/create',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            itemId: item.itemId,
+            color: item.color,
+          }),
+        },
+      );
+
+      const json = await response.json();
+      console.log('✅ Wishlist response:', json);
+    } catch (err) {
+      console.error('❌ Error adding to wishlist:', err);
+    }
+  };
+
+  const handleHeartPress = () => {
     if (authToken) {
-      navigation.navigate('Delivery');
+      addToWishList();
     } else {
       setIsModalVisible(true);
     }
@@ -26,8 +51,11 @@ const SubCategoryItem = ({item, navigation, itemId, authToken}) => {
   };
 
   const handleLoginPress = () => {
+    setReturnScreen('SubCategory'); // Store the current screen
     closeModal();
-    navigation.navigate('Login'); // Update if your login screen has a different name
+    navigation.navigate('Login', {
+      returnTo: 'SubCategory', // Pass to Login screen
+    });
   };
 
   return (
@@ -37,7 +65,8 @@ const SubCategoryItem = ({item, navigation, itemId, authToken}) => {
         navigation.navigate('ProductDetail', {itemId: item.itemId});
       }}>
       <Image source={item.image} style={styles.image} />
-      <TouchableOpacity style={styles.heartIcon} onPress={handleContinuePress}>
+
+      <TouchableOpacity style={styles.heartIcon} onPress={handleHeartPress}>
         <Image
           source={require('../assets/Images/Heart.png')}
           style={{width: 18, height: 18}}
@@ -93,7 +122,6 @@ const SubCategoryItem = ({item, navigation, itemId, authToken}) => {
     </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   // same styles as before...
   modalOverlay: {

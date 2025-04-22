@@ -677,9 +677,7 @@
 //   },
 // });
 
-
-
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -691,18 +689,18 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import Header from '../Component/Header';
 import AccordionItem from '../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const ProductDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { itemId } = route.params;
+  const {itemId} = route.params;
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [selectedColorImages, setSelectedColorImages] = useState([]);
@@ -711,7 +709,9 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const res = await fetch(`http://10.0.2.2:4000/api/itemDetails/${itemId}`);
+        const res = await fetch(
+          `http://10.0.2.2:4000/api/itemDetails/${itemId}`,
+        );
         const json = await res.json();
         if (json.data && json.data.length > 0) {
           const productData = json.data[0];
@@ -732,30 +732,57 @@ const ProductDetail = () => {
   }, [itemId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+    return <ActivityIndicator size="large" style={{marginTop: 50}} />;
   }
 
   if (!product) {
-    return <Text style={{ textAlign: 'center', marginTop: 50 }}>No product found</Text>;
+    return (
+      <Text style={{textAlign: 'center', marginTop: 50}}>No product found</Text>
+    );
   }
 
-  const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure } = product;
+  const {
+    itemId: itemInfo,
+    imagesByColor,
+    sizeChart,
+    deliveryDescription,
+    returnPolicy,
+    About,
+    isSize,
+    howToMeasure,
+  } = product;
 
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{paddingBottom: 100}}
+        showsVerticalScrollIndicator={false}>
         {/* Main Image & Thumbnails */}
         <View style={styles.imageSection}>
-        <TouchableWithoutFeedback
-            onPress={() => navigation.navigate('ProductDetailPhoto',{ images: selectedColorImages })}
-            >
-            <Image source={{ uri: selectedColorImages[0]?.url }} style={styles.mainImage} resizeMode="cover" />
+          <TouchableWithoutFeedback
+            onPress={() =>
+              navigation.navigate('ProductDetailPhoto', {
+                images: selectedColorImages,
+              })
+            }>
+            <Image
+              source={{uri: selectedColorImages[0]?.url}}
+              style={styles.mainImage}
+              resizeMode="cover"
+            />
           </TouchableWithoutFeedback>
 
-          <ScrollView style={styles.sideImages} showsVerticalScrollIndicator={true}>
+          <ScrollView
+            style={styles.sideImages}
+            showsVerticalScrollIndicator={true}>
             {selectedColorImages.slice(1).map((img, idx) => (
-              <Image key={idx} source={{ uri: img.url }} style={styles.thumbnail} resizeMode="cover" />
+              <Image
+                key={idx}
+                source={{uri: img.url}}
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
             ))}
           </ScrollView>
         </View>
@@ -765,7 +792,12 @@ const ProductDetail = () => {
           <Text style={styles.colorsText}>Colors</Text>
           <View style={styles.shareContainer}>
             <Text style={styles.shareText}>SHARE</Text>
-            <Feather name="share-2" size={16} color="black" style={{ marginLeft: 5 }} />
+            <Feather
+              name="share-2"
+              size={16}
+              color="black"
+              style={{marginLeft: 5}}
+            />
           </View>
         </View>
 
@@ -778,9 +810,8 @@ const ProductDetail = () => {
               onPress={() => {
                 setSelectedColorImages(colorObj.images);
                 setSizes(colorObj.sizes);
-              }}
-            >
-              <Text style={{ fontSize: 10 }}>{colorObj.color}</Text>
+              }}>
+              <Text style={{fontSize: 10}}>{colorObj.color}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -792,7 +823,9 @@ const ProductDetail = () => {
           <View style={styles.priceRow}>
             <Text style={styles.strikeThrough}>₹{itemInfo.MRP}</Text>
             <Text style={styles.price}> ₹{itemInfo.discountedPrice}</Text>
-            <Text style={styles.discount}>({Math.round(itemInfo.discountPercentage)}% off)</Text>
+            <Text style={styles.discount}>
+              ({Math.round(itemInfo.discountPercentage)}% off)
+            </Text>
           </View>
           <Text style={styles.delivery}>{deliveryDescription}</Text>
         </View>
@@ -802,7 +835,10 @@ const ProductDetail = () => {
           <View style={styles.priceSizeSection}>
             <View style={styles.sizeRow}>
               <Text style={styles.sizeText}>Select a size</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('SizeChart', { sizeChart, howToMeasure })}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('SizeChart', {sizeChart, howToMeasure})
+                }>
                 <Text style={styles.sizeChartText}>SIZE CHART</Text>
               </TouchableOpacity>
             </View>
@@ -830,7 +866,7 @@ const ProductDetail = () => {
             const [key] = Object.keys(item);
             return (
               <View key={idx}>
-                <Text style={{ fontWeight: 'bold' }}>{key.toUpperCase()}</Text>
+                <Text style={{fontWeight: 'bold'}}>{key.toUpperCase()}</Text>
                 <Text>{item[key]}</Text>
               </View>
             );
