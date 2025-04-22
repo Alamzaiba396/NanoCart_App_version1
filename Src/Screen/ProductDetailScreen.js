@@ -677,103 +677,164 @@
 //   },
 // });
 
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Image,
   TouchableOpacity,
-  StyleSheet, 
-
   ActivityIndicator,
+  StyleSheet,
+  Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import Header from '../Component/Header';
 import AccordionItem from '../Component/AccordionItem';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather';
 
-const ProductDetail = ({ route, navigation }) => {
+const { width } = Dimensions.get('window');
+
+const ProductDetail = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
   const { itemId } = route.params;
-  const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [selectedColorImages, setSelectedColorImages] = useState([]);
+  const [sizes, setSizes] = useState([]);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductDetails = async () => {
       try {
         const res = await fetch(`http://10.0.2.2:4000/api/itemDetails/${itemId}`);
-        console.log('Fetching Item ID:', itemId);
-        console.log('Response:', res.status);
         const json = await res.json();
         if (json.data && json.data.length > 0) {
-          setProductData(json.data[0]);
+          const productData = json.data[0];
+          setProduct(productData);
+          if (productData.imagesByColor?.length > 0) {
+            setSelectedColorImages(productData.imagesByColor[0].images);
+            setSizes(productData.imagesByColor[0].sizes || []);
+          }
         }
-      } catch (error) {
-        console.log('Error fetching item details:', error);
+      } catch (err) {
+        console.error('Error fetching product details:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProduct();
+
+    fetchProductDetails();
   }, [itemId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#9B5AF5" style={{ marginTop: 50 }} />;
+    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
   }
 
-  if (!productData) {
-    return <Text style={{ textAlign: 'center', marginTop: 20 }}>Product not found.</Text>;
+  if (!product) {
+    return <Text style={{ textAlign: 'center', marginTop: 50 }}>No product found</Text>;
   }
 
-  const { itemId: item, imagesByColor, deliveryDescription, returnPolicy, sizeChart } = productData;
-  const showSizeChart = !!(sizeChart && sizeChart.length > 0);
+  const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure } = product;
 
   return (
     <View style={styles.container}>
       <Header />
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-        {/* Image */}
-        <Image source={{ uri: item.image }} style={styles.mainImage} />
+        {/* Main Image & Thumbnails */}
+        <View style={styles.imageSection}>
+        <TouchableWithoutFeedback
+            onPress={() => navigation.navigate('ProductDetailPhoto',{ images: selectedColorImages })}
+            >
+            <Image source={{ uri: selectedColorImages[0]?.url }} style={styles.mainImage} resizeMode="cover" />
+          </TouchableWithoutFeedback>
 
-        {/* Name & Description */}
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.subTitle}>{item.description}</Text>
-
-        {/* Price Section */}
-        <View style={styles.priceRow}>
-          <Text style={styles.strikeThrough}>₹{item.MRP}</Text>
-          <Text style={styles.price}> ₹{item.discountedPrice}</Text>
-          <Text style={styles.discount}>({item.discountPercentage}% off)</Text>
+          <ScrollView style={styles.sideImages} showsVerticalScrollIndicator={true}>
+            {selectedColorImages.slice(1).map((img, idx) => (
+              <Image key={idx} source={{ uri: img.url }} style={styles.thumbnail} resizeMode="cover" />
+            ))}
+          </ScrollView>
         </View>
 
-        {/* Size Chart */}
-        {showSizeChart && (
+        {/* Colors */}
+        <View style={styles.colorsRow}>
+          <Text style={styles.colorsText}>Colors</Text>
+          <View style={styles.shareContainer}>
+            <Text style={styles.shareText}>SHARE</Text>
+            <Feather name="share-2" size={16} color="black" style={{ marginLeft: 5 }} />
+          </View>
+        </View>
+
+        {/* Color Buttons */}
+        <View style={styles.colors}>
+          {imagesByColor.map((colorObj, idx) => (
+            <TouchableOpacity
+              key={idx}
+              style={[styles.colorBox]}
+              onPress={() => {
+                setSelectedColorImages(colorObj.images);
+                setSizes(colorObj.sizes);
+              }}
+            >
+              <Text style={{ fontSize: 10 }}>{colorObj.color}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Product Details */}
+        <View style={styles.details}>
+          <Text style={styles.title}>{itemInfo.name}</Text>
+          <Text style={styles.subTitle}>{itemInfo.description}</Text>
+          <View style={styles.priceRow}>
+            <Text style={styles.strikeThrough}>₹{itemInfo.MRP}</Text>
+            <Text style={styles.price}> ₹{itemInfo.discountedPrice}</Text>
+            <Text style={styles.discount}>({Math.round(itemInfo.discountPercentage)}% off)</Text>
+          </View>
+          <Text style={styles.delivery}>{deliveryDescription}</Text>
+        </View>
+
+        {/* Sizes */}
+        {isSize && (
           <View style={styles.priceSizeSection}>
             <View style={styles.sizeRow}>
               <Text style={styles.sizeText}>Select a size</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('SizeChart')}>
+              <TouchableOpacity onPress={() => navigation.navigate('SizeChart', { sizeChart, howToMeasure })}>
                 <Text style={styles.sizeChartText}>SIZE CHART</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.sizeOptions}>
-              {imagesByColor[0]?.sizes.map((sizeObj, idx) => (
+              {sizes.map((sz, idx) => (
                 <TouchableOpacity key={idx} style={styles.sizeBox}>
-                  <Text style={styles.sizeBoxText}>{sizeObj.size}</Text>
+                  <Text style={styles.sizeBoxText}>{sz.size}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         )}
 
-        {/* Accordion */}
+        {/* Accordion Sections */}
         <AccordionItem title="About the Product">
-          <Text>{productData.About}</Text>
-        </AccordionItem>
-
-        <AccordionItem title="Check Delivery at Your Pincode">
-          <Text>{deliveryDescription}</Text>
+          <Text>{About}</Text>
         </AccordionItem>
 
         <AccordionItem title="Return Policies">
           <Text>{returnPolicy}</Text>
+        </AccordionItem>
+
+        <AccordionItem title="How to Measure">
+          {howToMeasure?.map((item, idx) => {
+            const [key] = Object.keys(item);
+            return (
+              <View key={idx}>
+                <Text style={{ fontWeight: 'bold' }}>{key.toUpperCase()}</Text>
+                <Text>{item[key]}</Text>
+              </View>
+            );
+          })}
         </AccordionItem>
       </ScrollView>
     </View>
@@ -788,42 +849,86 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
   },
+  imageSection: {
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
   mainImage: {
-    width: '100%',
-    height: 300,
+    width: '70%',
+    height: 350,
     borderRadius: 10,
-    resizeMode: 'cover',
+  },
+  sideImages: {
+    marginLeft: 10,
+    width: '25%',
+    height: 350,
+  },
+  thumbnail: {
+    width: '100%',
+    height: 100,
+    borderRadius: 10,
     marginBottom: 10,
+  },
+  colorsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  colorsText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  shareContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  shareText: {
+    fontSize: 14,
+  },
+  colors: {
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
+  colorBox: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+  },
+  details: {
+    marginVertical: 10,
   },
   title: {
-    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 16,
   },
   subTitle: {
-    color: '#666',
-    marginBottom: 10,
+    color: 'gray',
+    marginBottom: 5,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
   },
   strikeThrough: {
     textDecorationLine: 'line-through',
-    color: '#888',
-    fontSize: 14,
+    color: 'gray',
   },
   price: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 8,
-    color: '#333',
   },
   discount: {
-    color: '#F57C00',
+    color: 'orange',
     marginLeft: 8,
-    fontSize: 14,
+  },
+  delivery: {
+    color: 'gray',
+    marginTop: 5,
   },
   priceSizeSection: {
     borderWidth: 1,
@@ -836,11 +941,9 @@ const styles = StyleSheet.create({
   sizeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
   },
   sizeText: {
     fontSize: 14,
-    color: '#333',
   },
   sizeChartText: {
     fontSize: 14,
@@ -850,19 +953,18 @@ const styles = StyleSheet.create({
   sizeOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    marginTop: 10,
   },
   sizeBox: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 4,
-    marginRight: 5,
+    borderRadius: 5,
+    marginRight: 10,
     marginBottom: 5,
   },
   sizeBoxText: {
     fontSize: 14,
-    color: '#333',
   },
 });

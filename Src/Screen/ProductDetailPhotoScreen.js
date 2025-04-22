@@ -1,51 +1,49 @@
-import React, { useState } from 'react';
+// ProductDetailPhotoScreen.js
+import React, { useState, useEffect } from 'react';
 import { View, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
-// Get screen width for responsive design
 const { width } = Dimensions.get('window');
 
 const ProductDetailPhotoScreen = () => {
-  // State to manage the main image
-  const [mainImage, setMainImage] = useState(require('../assets/Images/Carosuel1.png'));
-  // State to track the active thumbnail
+  const route = useRoute();
+  const { images } = route.params || {};
+
+  const [mainImage, setMainImage] = useState(null);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
 
-  // Array of thumbnail images
-  const thumbnails = [
-    require('../assets/Images/Carosuel2.png'),
-    require('../assets/Images/Carosuel3.png'),
-    require('../assets/Images/Carosuel4.png'),
-  ];
+  useEffect(() => {
+    if (images && images.length > 0) {
+      setMainImage({ uri: images[0].url });
+    }
+  }, [images]);
 
-  // Function to handle thumbnail press
-  const handleThumbnailPress = (image, index) => {
-    setMainImage(image);
+  const handleThumbnailPress = (imageUrl, index) => {
+    setMainImage({ uri: imageUrl });
     setActiveThumbnail(index);
   };
 
+  if (!images || images.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
-      {/* Main Image */}
       <View style={styles.mainImageContainer}>
         <Image source={mainImage} style={styles.mainImage} resizeMode="contain" />
       </View>
 
-      {/* Thumbnails */}
       <View style={styles.thumbnailsContainer}>
-        {thumbnails.map((thumbnail, index) => (
+        {images.map((img, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => handleThumbnailPress(thumbnail, index)}
+            onPress={() => handleThumbnailPress(img.url, index)}
             style={[
               styles.thumbnailContainer,
               activeThumbnail === index && styles.activeThumbnail,
             ]}
           >
-            <Image
-              source={thumbnail}
-              style={styles.thumbnail}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: img.url }} style={styles.thumbnail} resizeMode="cover" />
           </TouchableOpacity>
         ))}
       </View>
@@ -53,7 +51,6 @@ const ProductDetailPhotoScreen = () => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -67,8 +64,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   mainImage: {
-    width: width - 40, // Subtract padding for responsive width
-    height: 400, // Adjust height as needed
+    width: width - 40,
+    height: 400,
     borderRadius: 8,
   },
   thumbnailsContainer: {
@@ -76,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   thumbnailContainer: {
-    width: (width - 60) / 4, // Divide by 4 for 4 thumbnails, subtract padding
+    width: (width - 60) / 4,
     height: (width - 60) / 4,
     borderRadius: 5,
     overflow: 'hidden',
@@ -87,7 +84,7 @@ const styles = StyleSheet.create({
   },
   activeThumbnail: {
     borderWidth: 2,
-    borderColor: '#ff6200', // Orange border for active thumbnail
+    borderColor: '#ff6200',
   },
 });
 
