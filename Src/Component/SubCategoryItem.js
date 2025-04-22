@@ -1,22 +1,85 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-const SubCategoryItem = ({ item, navigation,itemId }) => {
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Make sure this package is installed
 
-  console.log('👉 Received itemId in SubCategoryItem:', itemId);
-  
+const SubCategoryItem = ({item, navigation, itemId, authToken}) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleContinuePress = () => {
+    if (authToken) {
+      navigation.navigate('Delivery');
+    } else {
+      setIsModalVisible(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleLoginPress = () => {
+    closeModal();
+    navigation.navigate('Login'); // Update if your login screen has a different name
+  };
+
   return (
     <TouchableOpacity
-     style={styles.card}
-     onPress={() => {
-      console.log(' Navigating with itemId:', item.itemId);  
-      navigation.navigate('ProductDetail', { itemId: item.itemId });
-  }}>
-
+      style={styles.card}
+      onPress={() => {
+        navigation.navigate('ProductDetail', {itemId: item.itemId});
+      }}>
       <Image source={item.image} style={styles.image} />
-      <TouchableOpacity style={styles.heartIcon}>
-        <Image source={require('../assets/Images/Heart.png')} style={{ width: 18, height: 18 }} />
+      <TouchableOpacity style={styles.heartIcon} onPress={handleContinuePress}>
+        <Image
+          source={require('../assets/Images/Heart.png')}
+          style={{width: 18, height: 18}}
+        />
       </TouchableOpacity>
-      <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
+
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}>
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <TouchableOpacity onPress={closeModal} style={styles.closeIcon}>
+                  <Icon name="close" size={24} color="#000" />
+                </TouchableOpacity>
+
+                <Text style={styles.modalTitle}>Uh-oh!</Text>
+                <Text style={styles.modalMessage}>
+                  Looks like you haven't logged in!
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={handleLoginPress}>
+                  <Text style={styles.modalButtonText}>LOGIN TO CONTINUE</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.modalHelpText}>
+                  Having trouble logging in? Whatsapp Us
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <Text numberOfLines={1} style={styles.title}>
+        {item.name}
+      </Text>
       <Text style={styles.subtitle}>Women's Party Wear</Text>
       <View style={styles.priceRow}>
         <Text style={styles.mrp}>MRP ₹{item.mrp}</Text>
@@ -32,6 +95,52 @@ const SubCategoryItem = ({ item, navigation,itemId }) => {
 };
 
 const styles = StyleSheet.create({
+  // same styles as before...
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  closeIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 15,
+  },
+  modalButton: {
+    backgroundColor: '#f37022',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalHelpText: {
+    color: '#888',
+    fontSize: 13,
+    marginTop: 5,
+  },
   card: {
     width: '47%',
     backgroundColor: '#fff',
