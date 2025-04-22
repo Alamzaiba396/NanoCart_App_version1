@@ -1,10 +1,7 @@
-// CardSlider.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 
 const CardSlider = ({ images }) => {
-  console.log('CardSlider rendering with images:', images); // Debug log
-
   const screenWidth = Dimensions.get('window').width;
 
   return (
@@ -16,12 +13,8 @@ const CardSlider = ({ images }) => {
     >
       {images && images.length > 0 ? (
         images.map((image, index) => (
-          <View key={index} style={styles.card}>
-            <Image
-              source={image}
-              style={styles.image}
-              onError={(error) => console.log(`Image ${index} load error:`, error.nativeEvent.error)} // Fixed syntax
-            />
+          <View key={index} style={[styles.card, { width: screenWidth * 0.6 }]}>
+            <Image source={image} style={styles.image} resizeMode="cover" />
             <TouchableOpacity style={styles.shopButton}>
               <Text style={styles.shopButtonText}>SHOP NOW</Text>
             </TouchableOpacity>
@@ -36,38 +29,38 @@ const CardSlider = ({ images }) => {
 
 const styles = StyleSheet.create({
   sliderContainer: {
-    flexGrow: 0,
-    height: 300, // Fixed height to ensure space
+    height: 280,
   },
   contentContainer: {
-    paddingVertical: 10,
+    paddingLeft: 15,
+    paddingRight: 5,
+    alignItems: 'center',
   },
   card: {
-    width: Dimensions.get('window').width * 0.7, // 80% of screen width per card
-    height: 300,
-    marginHorizontal: 10,
-    position: 'relative',
+    height: 260,
+    marginRight: 15,
+    borderRadius: 10,
     overflow: 'hidden',
-    borderRadius: 0,
+    backgroundColor: '#f0f0f0',
+    position: 'relative',
+    alignItems: 'center', // centers the button horizontally
   },
   image: {
-    width: '90%',
-    height: '100%', // Fixed height to match card
-    resizeMode: 'cover',
+    width: '100%',
+    height: '100%',
   },
   shopButton: {
     position: 'absolute',
-    bottom: 20,
-    left: '50%',
-    transform: [{ translateX: -50 }],
+    bottom: 15,
     backgroundColor: '#D86427',
-    paddingVertical: 10,
     paddingHorizontal: 20,
+    paddingVertical: 8,
     borderRadius: 5,
+    alignSelf: 'center', // ensures centering works
   },
   shopButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   errorText: {

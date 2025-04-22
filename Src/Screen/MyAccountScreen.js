@@ -1,57 +1,54 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const MyAccountScreen = ({navigation}) => {
+const MyAccountScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image source={require('../assets/Images/Backward.png')} style={styles.backIcon} />
+        </TouchableOpacity>
         <Text style={styles.headerText}>MY ACCOUNT</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Image source={require('../assets/Images/SearchIcon.png')} style={styles.icon} />
+          <Image source={require('../assets/Images/CartIcon.png')} style={styles.icon} />
+        </View>
       </View>
 
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <Image
-          style={styles.logo}
-          source={require('../assets/Images/MyAccount.png')} // Replace with actual logo URL
-        />
-        <View>
-          <Text style={styles.greeting}>Hi, Anuradha</Text>
-        </View>
+        <Image source={require('../assets/Images/Group.png')} style={styles.logo} />
+        <Text style={styles.greeting}>Hi, Anuradha</Text>
       </View>
 
       {/* Menu Items */}
       <View style={styles.menu}>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('Profile')}>
-          <Text style={styles.menuText}>Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Order History</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Saved Address</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Try Before You Buy (TBYB)</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('PartnerRegister')}>
-          <Text style={styles.menuText}>Become Partner</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Help Centre</Text>
-        </TouchableOpacity>
+        {[
+          { label: 'Profile', route: 'Profile' },
+          { label: 'Order History' },
+          { label: 'Saved Address' },
+          { label: 'Try Before You Buy (TBYB)' },
+          { label: 'Become Partner', route: 'PartnerRegister' },
+          { label: 'Settings' },
+          { label: 'Help Centre' },
+        ].map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.menuItem}
+            onPress={() => item.route && navigation.navigate(item.route)}
+          >
+            <Text style={styles.menuText}>{item.label}</Text>
+            <Image source={require('../assets/Images/arrowright.png')} style={styles.arrowIcon} />
+          </TouchableOpacity>
+        ))}
       </View>
 
       {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton}>
+      <TouchableOpacity onPress={()=>navigation.navigate('Login')} style={styles.logoutButton}>
         <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
     </View>
@@ -64,53 +61,82 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#d3d3d3',
-    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderColor: '#eee',
+    backgroundColor: '#fff',
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
+  },
+  backIcon: {
+    width: 20,
+    height: 20,
+    tintColor: '#000',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginLeft: 15,
+    tintColor: '#000',
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderColor: '#eee',
   },
   logo: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
+    width: 50,
+    height: 50,
+    marginRight: 15,
+    borderRadius: 8,
   },
   greeting: {
     fontSize: 16,
+    fontWeight: '600',
     color: '#000',
   },
   menu: {
-    flex: 1,
+    marginTop: 10,
   },
   menuItem: {
-    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderColor: '#eee',
   },
   menuText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#000',
   },
+  arrowIcon: {
+    width: 15,
+    height: 15,
+    tintColor: '#999',
+  },
   logoutButton: {
-    backgroundColor: '#F28C38',
-    padding: 15,
+    backgroundColor: '#DB4E2D',
+    paddingVertical: 12,
+    marginHorizontal: 15,
+    marginTop: 30,
     alignItems: 'center',
   },
   logoutText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 

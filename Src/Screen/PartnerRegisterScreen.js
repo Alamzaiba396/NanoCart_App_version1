@@ -1,160 +1,121 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ScrollView,
   Image,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import BackIcon from '../assets/Images/Backward.png';
-import ForwardIcon from '../assets/Images/Forward.png';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const CustomCheckbox = ({value, onValueChange}) => {
+const BackIcon = require('../assets/Images/Backward.png');
+
+const CustomCheckbox = ({ value, onValueChange }) => {
   return (
-    <TouchableOpacity
-      style={styles.checkboxBase}
-      onPress={() => onValueChange(!value)}>
+    <TouchableOpacity style={styles.checkboxBase} onPress={() => onValueChange(!value)}>
       {value && <View style={styles.checkboxTick} />}
     </TouchableOpacity>
   );
 };
 
-const PartnerRegisterScreen = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+const PartnerRegisterScreen = ({ navigation }) => {
+  const [name] = useState('Anuradha Sharma');
+  const [email] = useState('anuradha.s@gmail.com');
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [shopname, setShopname] = useState('');
+  const [shopName, setShopName] = useState('');
   const [gst, setGst] = useState('');
   const [pan, setPan] = useState('');
-  const [shopaddress, setShopaddress] = useState('');
+  const [shopAddress, setShopAddress] = useState('');
   const [pincode, setPincode] = useState('');
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.backButtonWrapper}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={BackIcon} style={styles.backIcon} />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        {/* Header */}
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Image source={BackIcon} style={styles.backIcon} />
+        </TouchableOpacity>
 
-        <View style={{flex: 1}}>
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={styles.container}>
-              <Text style={styles.title}>Register</Text>
-              <Text style={styles.subtitle}>Looks like you are new here!</Text>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Register</Text>
+          <Text style={styles.subtitle}>Looks like you are new here!</Text>
 
-              <TextInput
-                style={styles.input}
-                placeholder="Name*"
-                placeholderTextColor="#aaa"
-                value={name}
-                onChangeText={setName}
-              />
+          <TextInput style={styles.input} value={name} editable={false} />
+          <Text style={styles.input}>+91 - 6370100190</Text>
+          <TextInput style={styles.input} value={email} editable={false} />
 
-              <Text style={styles.staticPhone}>+91 – 6370100190</Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="E-mail ID*"
-                placeholderTextColor="#aaa"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-              />
-
-              <View style={styles.checkboxContainer}>
-                <CustomCheckbox
-                  value={isSubscribed}
-                  onValueChange={setIsSubscribed}
-                />
-                <Text style={styles.checkboxText}>
-                  Email me for offers and updates.
-                </Text>
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Shop Name*"
-                placeholderTextColor="#aaa"
-                value={shopname}
-                onChangeText={setShopname}
-              />
-              <View style={styles.requiredNo}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="GST No.*"
-                  placeholderTextColor="#aaa"
-                  value={gst}
-                  onChangeText={setGst}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="PAN No.*"
-                  placeholderTextColor="#aaa"
-                  value={pan}
-                  onChangeText={setPan}
-                />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Shop Address*"
-                placeholderTextColor="#aaa"
-                value={shopaddress}
-                onChangeText={setShopaddress}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Pincode"
-                placeholderTextColor="#aaa"
-                value={pincode}
-                onChangeText={setPincode}
-              />
-            </View>
-          </ScrollView>
-
-          {/* Button at the bottom */}
-          <View style={styles.bottomSection}>
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={() => navigation.navigate('PartnerVerification')}>
-              <View style={styles.registerContent}>
-                <Text style={styles.registerText}>REGISTER</Text>
-                <Image source={ForwardIcon} style={styles.forwardIcon} />
-              </View>
-            </TouchableOpacity>
-
-            <Text style={styles.footerText}>
-              Having trouble logging in?{' '}
-              <Text style={styles.whatsappText}>Whatsapp Us</Text>
-            </Text>
+          <View style={styles.checkboxContainer}>
+            <CustomCheckbox value={isSubscribed} onValueChange={setIsSubscribed} />
+            <Text style={styles.checkboxText}>Email me for offers and updates.</Text>
           </View>
 
+          <TextInput
+            style={styles.input}
+            placeholder="Shop Name*"
+            value={shopName}
+            onChangeText={setShopName}
+            placeholderTextColor="#aaa"
+          />
+
+          <View style={styles.rowInputs}>
+            <TextInput
+              style={[styles.input, { flex: 1, marginRight: 10 }]}
+              placeholder="GST No."
+              value={gst}
+              onChangeText={setGst}
+              placeholderTextColor="#aaa"
+            />
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="PAN No.*"
+              value={pan}
+              onChangeText={setPan}
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Shop Address*"
+            value={shopAddress}
+            onChangeText={setShopAddress}
+            placeholderTextColor="#aaa"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Pincode*"
+            value={pincode}
+            onChangeText={setPincode}
+            placeholderTextColor="#aaa"
+            keyboardType="numeric"
+          />
+
+          {/* Register Button */}
+          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('PartnerVerification')}>
+            <Text style={styles.registerButtonText}>REGISTER</Text>
+            <Icon name="arrowright" size={18} color="#fff" style={{ marginLeft: 8 }} />
+          </TouchableOpacity>
+
+          <Text style={styles.footerText}>
+            Having trouble logging in? <Text style={styles.whatsappText}>Whatsapp Us</Text>
+          </Text>
+
+          {/* Upload Section */}
           <View style={styles.uploadContainer}>
-            <Text style={styles.label}>
-              Shop Image<Text style={{color: '#F4A261'}}>*</Text>
-            </Text>
+            <Text style={styles.uploadLabel}>Shop Image*</Text>
             <TouchableOpacity style={styles.uploadButton}>
-              <Text style={styles.buttonText}>
-                Upload
-                <Icon
-                  name="upload"
-                  size={16}
-                  color="#fff"
-                  style={{marginLeft: 20}}
-                />
+              <Text style={styles.uploadText}>
+                Upload <Icon name="upload" size={14} color="#fff" />
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -163,36 +124,19 @@ const PartnerRegisterScreen = ({navigation}) => {
 export default PartnerRegisterScreen;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    paddingBottom: 20,
-  },
-  label: {
-    color: '#757575',
-    fontSize: 16,
-  },
-  uploadButton: {
-    backgroundColor: '#D86427',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-
   container: {
     padding: 25,
-    paddingTop: 80,
+    paddingTop: 60,
   },
-  backButtonWrapper: {
+  backButton: {
     position: 'absolute',
     top: 20,
     left: 20,
-    zIndex: 10,
+    zIndex: 99,
   },
   backIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     resizeMode: 'contain',
   },
   title: {
@@ -212,92 +156,79 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 10,
     marginBottom: 25,
-  },
-  staticPhone: {
-    fontSize: 16,
-    marginBottom: 25,
-    color: '#222',
-    borderBottomWidth: 1,
-    borderBottomColor: '#aaa',
-    paddingVertical: 10,
+    color: '#000',
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-  },
-  checkboxText: {
-    fontSize: 14,
-    marginLeft: 12,
-    color: '#555',
+    marginBottom: 25,
   },
   checkboxBase: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     borderWidth: 1.5,
     borderColor: '#D86427',
-    borderRadius: 4,
+    borderRadius: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxTick: {
-    width: 12,
-    height: 12,
+    width: 10,
+    height: 10,
     backgroundColor: '#D86427',
-    borderRadius: 2,
+    borderRadius: 1,
   },
-  requiredNo: {
+  checkboxText: {
+    marginLeft: 12,
+    fontSize: 14,
+    color: '#555',
+  },
+  rowInputs: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  bottomSection: {
-    padding: 25,
-    borderTopWidth: 1,
-    borderColor: '#eee',
-    backgroundColor: '#fff',
+    marginBottom: 25,
   },
   registerButton: {
+    flexDirection: 'row',
     backgroundColor: '#D86427',
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
     marginBottom: 15,
   },
-  registerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  registerText: {
+  registerButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  forwardIcon: {
-    width: 16,
-    height: 16,
-    tintColor: '#fff',
-    resizeMode: 'contain',
   },
   footerText: {
     fontSize: 12,
     color: '#444',
     textAlign: 'center',
+    marginBottom: 20,
   },
   whatsappText: {
     color: '#D86427',
     fontWeight: '600',
   },
+  uploadContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  uploadLabel: {
+    fontSize: 14,
+    color: '#444',
+  },
   uploadButton: {
     backgroundColor: '#F28C38',
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     borderRadius: 5,
   },
-  uploadContainer: {
-    padding: 25,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  uploadText: {
+    color: '#fff',
+    fontSize: 14,
   },
 });
