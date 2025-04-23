@@ -1,17 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  SafeAreaView,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-// import ForwardIcon from '../assets/Images/Forward.png';
+import BackIcon from '../assets/Images/Backward.png'; // Local back icon
+import { useNavigation } from '@react-navigation/native';
 
 const PartnerVerificationScreen = () => {
+  const [code, setCode] = useState('');
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Back Arrow */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image source={BackIcon} style={styles.backIcon} />
+        </TouchableOpacity>
+      </View>
+
       {/* Main Content */}
       <View style={styles.content}>
         <Text style={styles.title}>Partner Verification</Text>
@@ -20,107 +33,106 @@ const PartnerVerificationScreen = () => {
           style={styles.input}
           placeholder="Enter the partner verification code"
           placeholderTextColor="#757575"
+          value={code}
+          onChangeText={setCode}
         />
 
         <Text style={styles.subText}>
           Don’t have one? <Text style={styles.link}>Whatsapp Us</Text>
         </Text>
 
-        <Text style={styles.infoText}>
-          Partner Registration is incomplete without the code.{'\n'}
-          If you're unable to reach us, don't worry!
-          {'\n'}
-          Our team will contact you shortly.
-        </Text>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>
+            Partner Registration is incomplete without the code.
+            {"\n"}If you're unable to reach us, don't worry!
+            {"\n"}Our team will contact you shortly.
+          </Text>
+        </View>
       </View>
-      <View>
-        <TouchableOpacity
-          style={styles.getStartButton}
-          onPress={() => navigation.navigate('Home')}>
-          <View style={styles.getStartContent}>
-            <Text style={styles.getStartText}>GET STARTED</Text>
-            <Icon name="arrowright" style={styles.forwardIcon} />
-            {/* <Image source={ForwardIcon} style={styles.forwardIcon} /> */}
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+
+      {/* Button */}
+      <TouchableOpacity
+        style={styles.getStartedButton}
+        onPress={() => navigation.navigate('Home')} 
+      >
+        <View style={styles.buttonContent}>
+          <Text style={styles.buttonText}>GET STARTED</Text>
+          <Icon name="arrowright" size={18} color="#fff" />
+        </View>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
+
+export default PartnerVerificationScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    textAlign: 'center',
-    justifyContent: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
   },
-
+  header: {
+    paddingTop: 20,
+  },
+  backIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
+  },
   content: {
-    textAlign: 'center',
-    justifyContent: 'center',
+    marginTop: 50,
   },
   title: {
-    textAlign: 'center',
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'serif',
+    fontWeight: '500',
     color: '#000',
-    marginBottom: 20,
+    marginBottom: 30,
   },
-
   input: {
-    justifyContentcent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    width: '100%',
     fontSize: 16,
-    paddingVertical: 5,
+    paddingVertical: 8,
     marginBottom: 25,
-    textAlign: 'center',
+    color: '#000',
   },
   subText: {
-    textAlign: 'center',
     fontSize: 14,
     color: '#757575',
-    marginBottom: 10,
-  },
-  link: {
-    fontWeight: 'bold',
-    color: '#D86427',
-    textDecorationLine: 'underline',
-  },
-  infoText: {
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: '#D2691E0D',
-    color: '#696969',
-    textAlign: 'center',
     marginBottom: 20,
   },
-
-  getStartButton: {
-    marginTop: 50,
+  link: {
+    color: '#D86427',
+    fontWeight: '600',
+  },
+  infoBox: {
+    backgroundColor: '#D2691E0D',
+    padding: 12,
+    borderRadius: 4,
+  },
+  infoText: {
+    color: '#696969',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  getStartedButton: {
     backgroundColor: '#D86427',
     paddingVertical: 14,
     alignItems: 'center',
+    borderRadius: 4,
+    marginTop: 'auto',
+    marginBottom: 25,
   },
-  getStartContent: {
+  buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
-  getStartText: {
+  buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  forwardIcon: {
-    width: 16,
-    height: 16,
-    tintColor: '#000',
-    resizeMode: 'contain',
-  },
 });
-
-export default PartnerVerificationScreen;

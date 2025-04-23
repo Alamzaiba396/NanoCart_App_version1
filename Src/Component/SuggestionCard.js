@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SuggestionCard = ({
   title,
@@ -14,7 +15,7 @@ const SuggestionCard = ({
   sizes,
   colors,
   buttonLabel,
-  onButtonPress
+  onButtonPress,
 }) => {
   return (
     <View style={styles.container}>
@@ -26,15 +27,21 @@ const SuggestionCard = ({
         <View style={styles.details}>
           <Text style={styles.name}>{productName}</Text>
           <Text style={styles.desc}>{productDesc}</Text>
+
           <View style={styles.priceRow}>
             <Text style={styles.price}>₹{price}</Text>
             <Text style={styles.oldPrice}>₹{oldPrice}</Text>
             <Text style={styles.discount}>Flat {discount}% Off</Text>
           </View>
+
           <View style={styles.ratingRow}>
-            <Text style={styles.rating}>⭐ {rating}</Text>
-            <Text style={styles.review}>{reviews} Reviews</Text>
+            <View style={styles.ratingBox}>
+              <Icon name="star" size={10} color="#fff" />
+              <Text style={styles.ratingText}> {rating}</Text>
+            </View>
+            <Text style={styles.review}>{reviews}</Text>
           </View>
+
           <Text style={styles.sizeText}>Available in {sizes.join(', ')}</Text>
 
           <View style={styles.colorRow}>
@@ -67,30 +74,31 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    
+    padding: 10,
   },
   image: {
     width: 100,
     height: 130,
-    borderRadius: 8,
   },
   details: {
     flex: 1,
     marginLeft: 12,
   },
   name: {
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 14,
   },
   desc: {
     fontSize: 12,
-    color: 'gray',
-    marginBottom: 5,
+    color: '#666',
+    marginBottom: 4,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 2,
   },
   price: {
     fontWeight: '700',
@@ -102,26 +110,32 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   discount: {
-    color: 'orangered',
+    color: '#DB4E2D',
     fontSize: 12,
     fontWeight: '600',
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     marginVertical: 4,
   },
-  rating: {
-    backgroundColor: '#FFA500',
-    color: '#fff',
+  ratingBox: {
+    flexDirection: 'row',
+    backgroundColor: '#DB4E2D',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 4,
-    paddingHorizontal: 4,
+    alignItems: 'center',
+  },
+  ratingText: {
+    color: '#fff',
     fontSize: 12,
+    fontWeight: '600',
   },
   review: {
     fontSize: 12,
-    color: 'gray',
+    color: '#666',
+    marginLeft: 8,
   },
   sizeText: {
     fontSize: 12,
@@ -129,7 +143,7 @@ const styles = StyleSheet.create({
   },
   colorRow: {
     flexDirection: 'row',
-    marginVertical: 4,
+    marginTop: 6,
   },
   colorDot: {
     width: 16,
@@ -142,10 +156,9 @@ const styles = StyleSheet.create({
   button: {
     borderWidth: 1,
     borderColor: '#DB4E2D',
-    paddingVertical: 8,
-    marginTop: 10,
+    paddingVertical: 10,
+    marginTop: 12,
     alignItems: 'center',
-    borderRadius: 4,
   },
   buttonText: {
     color: '#DB4E2D',

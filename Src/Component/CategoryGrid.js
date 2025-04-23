@@ -38,20 +38,22 @@ const CategoryGrid = ({ data, onItemPress }) => {
 
 const styles = StyleSheet.create({
   grid: {
-    padding: 10,
+    // padding: 10,
   },
   row: {
     justifyContent: 'space-between',
   },
   itemContainer: {
-    width: '48%',
-    marginBottom: 15,
+    width: '50%',
+   
     alignItems: 'center',
+    padding: 10,
   },
   itemImage: {
+  
     width: '100%',
     height: 150,
-    borderRadius: 8,
+    // borderRadius: 8,
   },
   itemText: {
     marginTop: 5,

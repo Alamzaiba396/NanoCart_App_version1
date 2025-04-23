@@ -188,6 +188,7 @@
 // });
 // export default GenderTabs;
 
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -206,7 +207,6 @@ const GenderTabs = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-
 
   // fetch category api here  :
   useEffect(() => {
@@ -316,6 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
     width: 60,
     marginTop: 4,
+    marginBottom: 10,
   },
   loader: {
     marginTop: 20,
