@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-const MyAccountScreen = () => {
+const PartnerAccountScreen = () => {
   const navigation = useNavigation();
 
   return (
@@ -43,10 +43,9 @@ const MyAccountScreen = () => {
           {label: 'Profile', route: 'Profile'},
           {label: 'Order History', route: 'OrderConfirmation'},
           {label: 'Saved Address'},
-          {label: 'Try Before You Buy (TBYB)'},
-          {label: 'Become Partner', route: 'PartnerRegister'},
+          {label: 'My Wallet', route: 'PartnerWallet'},
           {label: 'Settings'},
-          {label: 'Help Centre'},
+          {label: 'Help Centre', route: 'PartnerCatalogue'},
         ].map((item, index) => (
           <TouchableOpacity
             key={index}
@@ -70,6 +69,7 @@ const MyAccountScreen = () => {
     </View>
   );
 };
+export default PartnerAccountScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -153,5 +153,3 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
-
-export default MyAccountScreen;

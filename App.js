@@ -30,6 +30,8 @@ import PartnerCatalogueScreen from './Src/Screen/PartnerCatalogueScreen';
 import OrderConfirmation from './Src/Screen/OrderConfirmScreen';
 import OrderConfirmationScreen from './Src/Screen/OrderConfirmScreen';
 import PartnerOrderHistoryScreen from './Src/Screen/PartnerOrderHistoryScreen';
+import PartnerAccountScreen from './Src/Screen/PartnerAccountScreen';
+import PartnerWalletScreen from './Src/Screen/PartnerWalletScreen';
 
 const Stack = createStackNavigator();
 
@@ -86,6 +88,11 @@ const App = () => {
             name="PartnerOrderHistory"
             component={PartnerOrderHistoryScreen}
           />
+          <Stack.Screen
+            name="PartnerAccount"
+            component={PartnerAccountScreen}
+          />
+          <Stack.Screen name="PartnerWallet" component={PartnerWalletScreen} />
         </Stack.Navigator>
       </Provider>
     </NavigationContainer>

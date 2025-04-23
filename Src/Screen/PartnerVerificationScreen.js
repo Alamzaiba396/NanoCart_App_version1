@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import BackIcon from '../assets/Images/Backward.png'; // Local back icon
-import { useNavigation } from '@react-navigation/native';
+import BackIcon from '../assets/Images/Backward.png';
+import {useNavigation} from '@react-navigation/native';
 
 const PartnerVerificationScreen = () => {
   const [code, setCode] = useState('');
@@ -44,8 +44,8 @@ const PartnerVerificationScreen = () => {
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
             Partner Registration is incomplete without the code.
-            {"\n"}If you're unable to reach us, don't worry!
-            {"\n"}Our team will contact you shortly.
+            {'\n'}If you're unable to reach us, don't worry!
+            {'\n'}Our team will contact you shortly.
           </Text>
         </View>
       </View>
@@ -53,12 +53,13 @@ const PartnerVerificationScreen = () => {
       {/* Button */}
       <TouchableOpacity
         style={styles.getStartedButton}
-        onPress={() => navigation.navigate('Home')} 
-      >
-        <View style={styles.buttonContent}>
+        onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity
+          style={styles.buttonContent}
+          onPress={navigation.navigate('PartnerAccount')}>
           <Text style={styles.buttonText}>GET STARTED</Text>
           <Icon name="arrowright" size={18} color="#fff" />
-        </View>
+        </TouchableOpacity>
       </TouchableOpacity>
     </SafeAreaView>
   );
