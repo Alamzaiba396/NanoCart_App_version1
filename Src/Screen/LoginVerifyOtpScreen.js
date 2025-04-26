@@ -6,10 +6,11 @@ import { setAuthToken } from "../redux/reducers/authReducer";
 const screenWidth = Dimensions.get('window').width;
 
   const LoginVerifyOtpScreen = ({ route,navigation }) => {
-    
+    const { fromScreen, actionAfterLogin, itemId ,phone} = route.params;
+
   const dispatch = useDispatch();
 
-    const {  phone } = route.params;
+
     
     console.log("Phone:", phone);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -34,9 +35,7 @@ const screenWidth = Dimensions.get('window').width;
     }
   };
 
-  useEffect(() => {
-    console.log("Route params at OTP screen:", route?.params);
-  }, []);
+  
 
   const handleVerifyOTP = async () => {
     const enteredOTP = otp.join("");
@@ -81,14 +80,26 @@ const screenWidth = Dimensions.get('window').width;
         if (loginResponse.ok && loginData.success) {
           const token = loginData.data.token;
   
-          // ✅ Store token in Redux
+          //  Store token in Redux
           dispatch(setAuthToken({ token, user: { phoneNumber: phone } }));
   
-          console.log("✅ login successful. Token stored in Redux:", token);
+          console.log(" login successful. Token stored in Redux:", token);
   
-          Alert.alert("Success", "login successful!", [
-            { text: "OK", onPress: () => navigation.navigate("Cart") },
+          Alert.alert("Success", "Login successful!", [
+            {
+              text: "OK",
+              onPress: () => {
+                if (fromScreen === "SubCategoryScreen" && actionAfterLogin === "like_item") {
+                  navigation.navigate("SubCategoryScreen", { likedItemId: itemId });
+                }else if (fromScreen === "Cart") {
+                  navigation.navigate("Cart");
+                } else {
+                  navigation.navigate("Home");
+                } 
+              },
+            },
           ]);
+          
         } else {
           Alert.alert("Signup Failed", loginData.message || "Something went wrong during signup.");
         }

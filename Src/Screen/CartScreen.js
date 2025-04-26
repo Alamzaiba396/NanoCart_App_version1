@@ -48,7 +48,7 @@ const CartScreen = ({ navigation }) => {
       >
         {/* ✅ Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
             <Image source={backIcon} style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>CART</Text>
@@ -145,7 +145,7 @@ const CartScreen = ({ navigation }) => {
                 <Text style={styles.modalMessage}>Looks like you haven't logged in!</Text>
                 <TouchableOpacity style={styles.modalButton} onPress={() => {
                   setIsModalVisible(false);
-                  navigation.navigate('Login');
+                  navigation.navigate('Login', { fromScreen: 'Cart' });
                 }}>
                   <Text style={styles.modalButtonText}>LOGIN TO CONTINUE</Text>
                 </TouchableOpacity>
@@ -168,9 +168,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   header: {
+    marginTop:15,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 25,
     justifyContent: 'space-between',
   },
   headerTitle: {

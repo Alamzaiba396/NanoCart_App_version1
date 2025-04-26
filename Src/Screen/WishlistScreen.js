@@ -1,175 +1,129 @@
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Text, Image, Modal } from 'react-native';
-import Header from '../Component/Header';
-import SubCategoryItem from '../Component/SubCategoryItem';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Image,
+  Modal,
+  ActivityIndicator,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import FilterComponent from '../Component/FilterComponent';
 import SortComponent from '../Component/SortComponent';
+import WishlistCardItem from '../Component/WishlistCardItem';
 
-const productList = [
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree1.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree2.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree3.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree4.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree5.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree6.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree7.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree8.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree9.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree10.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree11.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree12.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree13.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-  {
-    name: 'MAAHI Popular: Georgette S...',
-    image: require('../assets/Images/saree14.png'),
-    mrp: '15.50',
-    price: '10.00',
-    discount: 33,
-    rating: 4.5,
-    reviews: '33 Ratings',
-  },
-];
-const WishlistScreen = ({ navigation }) => {
-  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const openFilterModal = () => setFilterModalVisible(true);
-  const closeFilterModal = () => setFilterModalVisible(false);
-  const openSortModal = () => setSortModalVisible(true);
-  const closeSortModal = () => setSortModalVisible(false);
+const WishlistScreen = () => {
+  const navigation = useNavigation();
+  const token = useSelector(state => state.auth.token);
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isFilterModalVisible, setFilterModalVisible] = React.useState(false);
+  const [isSortModalVisible, setSortModalVisible] = React.useState(false);
+
+  const cartItems = useSelector(state => state.cart.items);
+const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const fetchWishlist = async () => {
+    console.log(" Fetching wishlist...");
+    if (!token) {
+      console.warn(" No auth token found.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://10.0.2.2:4000/api/userwishlist', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log(" Wishlist response status:", response.status);
+
+      const data = await response.json();
+      console.log(" Wishlist API response:", data);
+
+      if (response.ok) {
+        setWishlist(data?.data?.items || []);
+        console.log(" Wishlist items set");
+      } else {
+        console.warn(" Failed to load wishlist:", data.message);
+      }
+    } catch (err) {
+      console.error(" Error fetching wishlist:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Header />
-      <FlatList
-        data={productList}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <SubCategoryItem item={item}  navigation={navigation} />}
-        contentContainerStyle={styles.grid}
-      />
-    
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Image source={require('../assets/Images/Back.png')} style={styles.backIcon} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>WISHLIST</Text>
+        </View>
 
-      {/* Filter Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isFilterModalVisible}
-        onRequestClose={closeFilterModal}>
-        <FilterComponent onClose={closeFilterModal} />
+        <View style={styles.rightIcons}>
+          <TouchableOpacity>
+            <Image source={require('../assets/Images/SearchIcon.png')} style={styles.icon} />
+          </TouchableOpacity>
+          {/* <TouchableOpacity style={styles.cartIconWrapper}>
+            <Image source={require('../assets/Images/Cart.png')} style={styles.icon} />
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>2</Text>
+            </View>
+          </TouchableOpacity> */}
+          <View style={styles.rightIcons}>
+  <TouchableOpacity style={styles.cartIconWrapper}>
+    <Image source={require('../assets/Images/Cart.png')} style={styles.icon} />
+    {cartCount > 0 && (
+      <View style={styles.cartBadge}>
+        <Text style={styles.cartBadgeText}>{cartCount}</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
+
+        </View>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={wishlist}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            // <WishlistCardItem item={item} navigation={navigation} />
+            <WishlistCardItem
+  item={item}
+  navigation={navigation}
+  onRemove={fetchWishlist} 
+/>
+
+          )}
+          contentContainerStyle={styles.grid}
+        />
+      )}
+
+      <Modal animationType="slide" transparent visible={isFilterModalVisible} onRequestClose={() => setFilterModalVisible(false)}>
+        <FilterComponent onClose={() => setFilterModalVisible(false)} />
       </Modal>
-
-      {/* Sort Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isSortModalVisible}
-        onRequestClose={closeSortModal} >
-        <SortComponent onClose={closeSortModal} />
+      <Modal animationType="slide" transparent visible={isSortModalVisible} onRequestClose={() => setSortModalVisible(false)}>
+        <SortComponent onClose={() => setSortModalVisible(false)} />
       </Modal>
     </View>
   );
@@ -178,49 +132,33 @@ const WishlistScreen = ({ navigation }) => {
 export default WishlistScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f6f6f6',
-  },
-  grid: {
-    padding: 10,
-  },
-  footerButtons: {
+  container: { flex: 1, backgroundColor: '#f6f6f6' },
+  header: {
+    marginTop: 2,
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 32,
+    backgroundColor: '#fff',
+    elevation: 2,
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingBottom: 10,
   },
-  filterBtn: {
-    backgroundColor: '#fff',
-    padding: 10,
+  headerLeft: { flexDirection: 'row', alignItems: 'center' },
+  backIcon: { width: 24, height: 24, resizeMode: 'contain', marginRight: 8 },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: '#000', textTransform: 'uppercase' },
+  rightIcons: { flexDirection: 'row', alignItems: 'center' },
+  icon: { width: 22, height: 22, resizeMode: 'contain', marginHorizontal: 8 },
+  cartIconWrapper: { position: 'relative' },
+  cartBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: 'orange',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: '45%',
+    paddingHorizontal: 4,
+    minWidth: 16,
     alignItems: 'center',
-    flexDirection: 'row',
     justifyContent: 'center',
   },
-  sortBtn: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: '45%',
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  icon: {
-    width: 18,
-    height: 18,
-    marginRight: 6,
-    resizeMode: 'contain',
-  },
-  iconText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  cartBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
 });

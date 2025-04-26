@@ -8,12 +8,11 @@ import {
   Image,
   StatusBar,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 const backIcon = require("../assets/Images/Backward.png");
 const forwardIcon = require("../assets/Images/Forward.png");
-const LoginScreen = () => {
-  const navigation = useNavigation();
+const LoginScreen = ({ navigation, route }) => {
+
   const [phone, setPhone] = useState("");
 
   const handleContinue = async () => {
@@ -43,9 +42,10 @@ const LoginScreen = () => {
       if (response.ok) {
         console.log('OTP request successful');
         navigation.navigate('LoginVerifyOtp', {
-         
           phone,
+          fromScreen: route?.params?.fromScreen, // rd
         });
+        
       } else {
         console.log('Server responded with error:', data.message);
         Alert.alert('OTP Failed', data.message || 'Something went wrong');
@@ -91,7 +91,7 @@ const LoginScreen = () => {
       </View>
 
       {/* Fixed Bottom Section */}
-      <View style={styles.bottomContainer}>
+      <View style={styles.bottomContainer}> 
         <TouchableOpacity
          onPress={handleContinue}
           style={styles.button} >

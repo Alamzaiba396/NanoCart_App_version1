@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,10 +9,33 @@ import {
   Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { useSelector } from 'react-redux';
 const DeliveryAddressScreen = ({ navigation }) => {
+  const token = useSelector(state => state.auth.token);
   const [modalVisible, setModalVisible] = useState(false);
   const [hasShownModal, setHasShownModal] = useState(false);
+  const [address, setAddress] = useState(null);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const response = await fetch('http://10.0.2.2:4000/api/user/address', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const json = await response.json();
+        if (response.ok && json.addresses?.addressDetail?.length > 0) {
+          const defaultAddress = json.addresses.addressDetail.find(a => a.isDefault) || json.addresses.addressDetail[0];
+          setAddress(defaultAddress);
+        }
+      } catch (err) {
+        console.error('Error fetching address:', err);
+      }
+    };
+
+    if (token) fetchAddress();
+  }, [token]);
 
   const handleContinue = () => {
     if (!hasShownModal) {
@@ -25,12 +49,20 @@ const DeliveryAddressScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Icon name="arrow-back" size={22} color="#000" />
+      {/* <View style={styles.header}>
+        <Icon name="arrow-back"  size={22} color="#000" />
         <Text style={styles.headerTitle}>DELIVERY ADDRESS</Text>
-      </View>
+      </View> */}
+     
+    <View style={styles.header}>
+  <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+    <Icon name="arrow-back" size={22} color="#000" />
+  </TouchableOpacity>
+  <Text style={styles.headerTitle}>DELIVERY ADDRESS</Text>
+</View>
 
-      {/* Steps Indicator */}
+
+      {/* Steps */}
       <View style={styles.stepIndicator}>
         <Text style={styles.stepActive}>■ CART DETAILS</Text>
         <Text style={styles.stepActive}>■ ADDRESS</Text>
@@ -39,27 +71,41 @@ const DeliveryAddressScreen = ({ navigation }) => {
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Deliver to Section */}
-        <View style={styles.deliverToContainer}>
-          {/* <Text style={styles.deliverToText}>Deliver to</Text> */}
-          <View style={styles.deliverToDetails}>
-            <Text style={styles.deliverToName}>Anuradha Sharma</Text>
-            <Text style={styles.deliverToAddress}>Anjurad, 724026</Text>
-            <Text style={styles.deliverToAddress}>Gujrat,742025</Text>
+        <View style={styles.deliverBox}>
+          <View style={styles.deliverRow}>
+            <Text style={styles.deliverToLabel}>Deliver to:</Text>
+            {/* <TouchableOpacity
+  onPress={() => navigation.navigate('AddNewAddress', { isEdit: true, address, userId: address?.userId })}
+  style={styles.changeButton}>
+  <Text style={styles.changeText}>CHANGE</Text>
+</TouchableOpacity> */}
+<TouchableOpacity
+  onPress={() => {
+    navigation.navigate('Saved', {
+      isEdit: true,
+      addressId: address?._id,  
+      address: address,         
+    });
+  }}
+  style={styles.changeButton}
+>
+  <Text style={styles.changeText}>CHANGE</Text>
+</TouchableOpacity>
+
           </View>
-          <TouchableOpacity onPress={()=>navigation.navigate('edit')}  style={styles.changeButton}>
-            <Text style={styles.changeText}>CHANGE</Text>
-          </TouchableOpacity>
+          <Text style={styles.deliverToName}>{address?.name || 'Loading...'}</Text>
+          <Text style={styles.deliverToAddress}>{address ? `${address.cityTown}, ${address.pincode}` : ''}</Text>
+          <Text style={styles.deliverToAddress}>{address?.state}</Text>
         </View>
 
-        {/* Add Address Button */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('AddNewAddress')}
-          style={styles.addAddressBtn}
-        >
-          <Text style={styles.addAddressText}>ADD  ADDRESS</Text>
-        </TouchableOpacity>
+        {/* Add Address Button (if no address) */}
+        {!address && (
+          <TouchableOpacity onPress={() => navigation.navigate('AddNewAddress')} style={styles.addAddressBtn}>
+            <Text style={styles.addAddressText}>ADD ADDRESS</Text>
+          </TouchableOpacity>
+        )}
 
-        {/* Price Details */}
+        {/* Price Details Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Price Details (2 items)</Text>
           <View style={styles.row}>
@@ -86,11 +132,9 @@ const DeliveryAddressScreen = ({ navigation }) => {
             <Text style={styles.totalLabel}>Total Amount</Text>
             <Text style={styles.totalValue}>₹2296.7</Text>
           </View>
-
           <View style={styles.savingBox}>
             <Text style={styles.savingText}>
-              Hooray! You are saving{' '}
-              <Text style={styles.highlight}>₹1049/-</Text> with this order!
+              Hooray! You are saving <Text style={styles.highlight}>₹1049/-</Text> with this order!
             </Text>
           </View>
         </View>
@@ -102,27 +146,17 @@ const DeliveryAddressScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Continue Button */}
+      {/* Continue to Payment Button */}
       <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-        <Text style={styles.continueText}>CONTINUE To PAYMENT</Text>
+        <Text style={styles.continueText}>CONTINUE TO PAYMENT</Text>
       </TouchableOpacity>
 
       {/* Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <Text style={styles.modalText}>
-              This is a one-time message before proceeding.
-            </Text>
-            <TouchableOpacity
-              style={styles.modalBtn}
-              onPress={() => setModalVisible(false)}
-            >
+            <Text style={styles.modalText}>This is a one-time message before proceeding.</Text>
+            <TouchableOpacity style={styles.modalBtn} onPress={() => setModalVisible(false)}>
               <Text style={styles.modalBtnText}>Got it</Text>
             </TouchableOpacity>
           </View>
@@ -323,4 +357,39 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+
+
+
+
+
+
+
+  deliverBox: {
+    backgroundColor: '#fdf0e7',
+    padding: 15,
+    borderRadius: 6,
+    marginBottom: 16,
+  },
+  deliverRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  deliverToLabel: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  continueBtn: {
+    backgroundColor: '#f37022',
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  continueText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  
 });
+

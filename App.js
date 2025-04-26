@@ -22,11 +22,13 @@ import MyAccountScreen from "./Src/Screen/MyAccountScreen";
 import { Provider } from "react-redux";
 import { store } from "./Src/redux/store";
 import LoginVerifyOtpScreen from "./Src/Screen/LoginVerifyOtpScreen";
-import WishlistScreen from "./Src/Screen/WishlistScreen";
 import ProfileScreen from "./Src/Screen/ProfileScreen";
 import PartnerRegisterScreen from "./Src/Screen/PartnerRegisterScreen";
 import PartnerVerificationScreen from "./Src/Screen/PartnerVerificationScreen";
 import PartnerCatalogueScreen from "./Src/Screen/PartnerCatalogueScreen";
+import WishlistScreen from "./Src/Screen/WishlistScreen";
+import SavedAddressScreen from "./Src/Screen/SavedAddressScreen";
+
 
 const Stack = createStackNavigator();
 
@@ -37,7 +39,6 @@ const App = () => {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Home" component={BottomTabBar} />
-        <Stack.Screen name="wishlist" component={BottomTabBar} />
         <Stack.Screen name="Promo" component={PromoBanner} />
         <Stack.Screen name="Card" component={CardSlider} />
         <Stack.Screen name="Search" component={SearchCategory} />
@@ -60,6 +61,7 @@ const App = () => {
         <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
         <Stack.Screen name="PartnerVerification" component={PartnerVerificationScreen} />
         <Stack.Screen name="PartnerCatalogue" component={PartnerCatalogueScreen} />
+        <Stack.Screen name="Saved" component={SavedAddressScreen} />
       </Stack.Navigator>
       </Provider>
     </NavigationContainer>
