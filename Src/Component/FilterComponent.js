@@ -121,15 +121,15 @@ const FilterComponent = ({ onClose }) => {
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>FILTER</Text>
-          <TouchableOpacity onPress={clearAll} style={styles.clearButton}>
+          <TouchableOpacity onPress={clearAll}>
             <Text style={styles.clearText}>Clear all</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Main Body */}
+        {/* Body */}
         <View style={styles.body}>
-          {/* Left Side Menu */}
-          <View style={styles.leftColumn}>
+          {/* Left Side */}
+          <ScrollView style={styles.leftColumn}>
             {categories.map((cat) => (
               <TouchableOpacity
                 key={cat.key}
@@ -149,12 +149,12 @@ const FilterComponent = ({ onClose }) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
-
-          {/* Right Side Options */}
-          <ScrollView style={styles.rightColumn}>
-            {renderOptions()}
           </ScrollView>
+
+          {/* Right Side */}
+          <View style={styles.rightColumn}>
+            <ScrollView>{renderOptions()}</ScrollView>
+          </View>
         </View>
 
         {/* Apply Button */}
@@ -169,95 +169,88 @@ const FilterComponent = ({ onClose }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#fff',
   },
   content: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    maxHeight: '90%',
-    paddingHorizontal: 0,
-    paddingBottom: 10,
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderColor: '#eee',
   },
   backButton: {
     padding: 5,
   },
   backText: {
-    fontSize: 20,
+    fontSize: 22,
+    fontWeight: 'bold',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  clearButton: {
-    padding: 5,
-  },
   clearText: {
     fontSize: 14,
-    color: '#D86427',
-    fontWeight: '600',
+    color: '#F36F25',
+    fontWeight: 'bold',
   },
   body: {
     flexDirection: 'row',
-    height: '75%',
+    flex: 1,
   },
   leftColumn: {
     width: '35%',
-    backgroundColor: '#f7f7f7',
-    paddingVertical: 10,
+    backgroundColor: '#f9f9f9',
     borderRightWidth: 1,
     borderColor: '#eee',
   },
   rightColumn: {
-    width: '65%',
+    flex: 1,
     padding: 15,
   },
   categoryButton: {
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 10,
   },
   categoryText: {
     fontSize: 14,
-    color: '#000',
+    color: '#333',
   },
   activeCategory: {
     backgroundColor: '#EFE2D8',
   },
   activeCategoryText: {
-    color: '#D86427',
+    color: '#F36F25',
     fontWeight: 'bold',
   },
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderColor: '#ddd',
   },
   optionText: {
     marginLeft: 10,
     fontSize: 14,
-  },
-  placeholderText: {
-    fontSize: 14,
-    color: '#888',
+    color: '#000',
   },
   applyButton: {
-    backgroundColor: '#D86427',
-    padding: 14,
-    margin: 15,
-    borderRadius: 5,
+    backgroundColor: '#F36F25',
+    marginHorizontal: 15,
+    marginVertical: 10,
+    paddingVertical: 14,
+    borderRadius: 4,
     alignItems: 'center',
   },
   applyButtonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
+    fontSize: 16,
   },
   checkboxBase: {
     width: 20,
@@ -269,13 +262,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#D86427',
-    borderColor: '#D86427',
+    backgroundColor: '#F36F25',
+    borderColor: '#F36F25',
   },
   checkmark: {
-    color: 'white',
-    fontSize: 14,
+    color: '#fff',
     fontWeight: 'bold',
+  },
+  placeholderText: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 50,
   },
 });
 

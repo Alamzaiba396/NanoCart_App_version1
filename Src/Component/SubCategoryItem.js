@@ -16,7 +16,6 @@ const SubCategoryItem = ({ item, navigation }) => {
 
   const [showModal, setShowModal] = useState(false);
 
-
   const handleHeartPress = () => {
     console.log(" Heart icon pressed.");
     console.log(" Current token value:", token);
@@ -41,8 +40,6 @@ const SubCategoryItem = ({ item, navigation }) => {
     }
   };
   
-
-
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -63,11 +60,11 @@ const SubCategoryItem = ({ item, navigation }) => {
           <Image source={require('../assets/Images/Heart.png')} style={{ width: 18, height: 18 }} />
         </TouchableOpacity>
         <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
-        <Text style={styles.subtitle}>Women's Party Wear</Text>
+        <Text style={styles.subtitle}>{item.description}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.mrp}>MRP ₹{item.mrp}</Text>
           <Text style={styles.price}>₹{item.price}</Text>
-          <Text style={styles.discount}>{item.discount}% Off</Text>
+          {/* <Text style={styles.discount}>{item.discount}% Off</Text> */}
         </View>
         <View style={styles.ratingRow}>
           <Text style={styles.stars}>⭐ {item.rating}</Text>

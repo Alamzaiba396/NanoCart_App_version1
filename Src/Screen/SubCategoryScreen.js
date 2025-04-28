@@ -81,17 +81,7 @@ const SubCategoryScreen = ({ navigation, route }) => {
           numColumns={2}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <SubCategoryItem item={item}  itemId={item.itemId}  navigation={navigation} />}
-          // renderItem={({ item }) => (
-          //   <TouchableOpacity
-          //     onPress={() => {   
-          //       dispatch(setSelectedItem(item)); // ✅ STORE IN REDUX
-          //       console.log("✅ Dispatched item to store:", item);
-          //       navigation.navigate('SubCategoryItem'); // ✅ Open detail screen
-          //     }}
-          //   >    <SubCategoryItem item={item} navigation={navigation} />
-             
-          //   </TouchableOpacity>
-          // )}
+       
           contentContainerStyle={styles.grid}
         />
       )}

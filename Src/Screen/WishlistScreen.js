@@ -78,12 +78,7 @@ const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
           <TouchableOpacity>
             <Image source={require('../assets/Images/SearchIcon.png')} style={styles.icon} />
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.cartIconWrapper}>
-            <Image source={require('../assets/Images/Cart.png')} style={styles.icon} />
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>2</Text>
-            </View>
-          </TouchableOpacity> */}
+       
           <View style={styles.rightIcons}>
   <TouchableOpacity style={styles.cartIconWrapper}>
     <Image source={require('../assets/Images/Cart.png')} style={styles.icon} />
@@ -107,7 +102,7 @@ const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
           numColumns={2}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            // <WishlistCardItem item={item} navigation={navigation} />
+           
             <WishlistCardItem
   item={item}
   navigation={navigation}

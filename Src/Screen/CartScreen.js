@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
@@ -17,6 +16,8 @@ const CartScreen = ({ navigation }) => {
   const authToken = useSelector(state => state.auth.token);
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+
+  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ total quantity
 
   useEffect(() => {
     if (authToken) {
@@ -50,7 +51,6 @@ const CartScreen = ({ navigation }) => {
         color: cartItem.color,
         skuId: cartItem.skuId,
       };
-
       const response = await fetch('http://10.0.2.2:4000/api/usercart/removeitem', {
         method: 'DELETE',
         headers: {
@@ -59,7 +59,6 @@ const CartScreen = ({ navigation }) => {
         },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
       if (response.ok) {
         fetchCartItems();
@@ -80,7 +79,6 @@ const CartScreen = ({ navigation }) => {
         skuId: cartItem.skuId,
         action: actionType,
       };
-
       const response = await fetch('http://10.0.2.2:4000/api/usercart/update-quantity', {
         method: 'PUT',
         headers: {
@@ -89,7 +87,6 @@ const CartScreen = ({ navigation }) => {
         },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
       if (response.ok) {
         fetchCartItems();
@@ -109,23 +106,57 @@ const CartScreen = ({ navigation }) => {
     }
   };
 
-  // 🧮 Calculate dynamic totals
-  const cartTotalMRP = cartItems.reduce((total, item) => total + (1499 * item.quantity), 0); // Assuming MRP is 1499
-  const discountedTotal = cartItems.reduce((total, item) => total + (1100 * item.quantity), 0); // Assuming discount price 1100
+  const handleMoveToWishlist = async (cartItem) => {
+    try {
+      const payload = {
+        itemId: cartItem.itemId._id,
+        color: cartItem.color,
+      };
+      const response = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await handleRemoveItem(cartItem);
+        navigation.navigate('Wishlist');
+      } else {
+        console.error(' Failed to move to wishlist:', data.message);
+      }
+    } catch (error) {
+      console.error(' Error moving to wishlist:', error);
+    }
+  };
+
+  const cartTotalMRP = cartItems.reduce((total, item) => total + (1499 * item.quantity), 0);
+  const discountedTotal = cartItems.reduce((total, item) => total + (1100 * item.quantity), 0);
   const couponDiscount = 200;
-  const gstAmount = (discountedTotal * 0.135).toFixed(1); // Example: 13.5% GST
+  const gstAmount = (discountedTotal * 0.135).toFixed(1);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-
+        
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.navigate('Home')}>
             <Image source={backIcon} style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>CART</Text>
-          <Image source={cartIcon} style={styles.icon} />
+
+          {/* Cart Icon with Badge */}
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={{ position: 'relative' }}>
+            <Image source={cartIcon} style={styles.icon} />
+            {totalCartCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{totalCartCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
         {/* Progress bar */}
@@ -156,17 +187,11 @@ const CartScreen = ({ navigation }) => {
                   {/* Quantity Section */}
                   <View style={styles.qtyRow}>
                     <Text>Qty:</Text>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => handleUpdateQuantity(cartItem, 'decrease')}
-                    >
+                    <TouchableOpacity style={styles.qtyBtn} onPress={() => handleUpdateQuantity(cartItem, 'decrease')}>
                       <Entypo name="chevron-down" size={14} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.qtyNumber}>{cartItem.quantity}</Text>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => handleUpdateQuantity(cartItem, 'increase')}
-                    >
+                    <TouchableOpacity style={styles.qtyBtn} onPress={() => handleUpdateQuantity(cartItem, 'increase')}>
                       <Entypo name="chevron-up" size={14} color="#fff" />
                     </TouchableOpacity>
                   </View>
@@ -178,7 +203,7 @@ const CartScreen = ({ navigation }) => {
 
               {/* Move to wishlist and Remove */}
               <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.actionBtn}>
+                <TouchableOpacity style={styles.actionBtn} onPress={() => handleMoveToWishlist(cartItem)}>
                   <Text style={styles.actionText}>MOVE TO WISHLIST</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionBtn} onPress={() => handleRemoveItem(cartItem)}>
@@ -214,30 +239,6 @@ const CartScreen = ({ navigation }) => {
         <Text style={styles.paymentRow}>Payment Method <Text style={{ fontWeight: 'bold' }}>UPI</Text></Text>
 
       </ScrollView>
-
-      {/* Login Modal */}
-      <Modal visible={isModalVisible} transparent animationType="fade" onRequestClose={() => setIsModalVisible(false)}>
-        <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContent}>
-                <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeIcon}>
-                  <Icon name="close" size={24} color="#000" />
-                </TouchableOpacity>
-                <Text style={styles.modalTitle}>Uh-oh!</Text>
-                <Text style={styles.modalMessage}>Looks like you haven't logged in!</Text>
-                <TouchableOpacity style={styles.modalButton} onPress={() => {
-                  setIsModalVisible(false);
-                  navigation.navigate('Login', { fromScreen: 'Cart' });
-                }}>
-                  <Text style={styles.modalButtonText}>LOGIN TO CONTINUE</Text>
-                </TouchableOpacity>
-                <Text style={styles.modalHelpText}>Having trouble logging in? Whatsapp Us</Text>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </View>
   );
 };
@@ -325,4 +326,21 @@ const styles = StyleSheet.create({
   modalButton: { backgroundColor: '#f37022', paddingVertical: 12, paddingHorizontal: 25, borderRadius: 5, marginVertical: 10 },
   modalButtonText: { color: '#fff', fontWeight: 'bold' },
   modalHelpText: { color: '#888', fontSize: 13, marginTop: 5 },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -8,
+    backgroundColor: '#F36F25',
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  
 });
