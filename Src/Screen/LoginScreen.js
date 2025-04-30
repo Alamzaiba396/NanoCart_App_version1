@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   View,
   Text,
   TextInput,
@@ -43,7 +44,7 @@ const LoginScreen = ({ navigation, route }) => {
         console.log('OTP request successful');
         navigation.navigate('LoginVerifyOtp', {
           phone,
-          fromScreen: route?.params?.fromScreen, // rd
+          fromScreen: route?.params?.fromScreen, // 
         });
         
       } else {

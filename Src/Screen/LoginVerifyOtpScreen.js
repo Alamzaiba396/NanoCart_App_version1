@@ -1,4 +1,4 @@
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef, } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, Dimensions } from 'react-native';
 import { useDispatch } from "react-redux";
 import { setAuthToken } from "../redux/reducers/authReducer"; 

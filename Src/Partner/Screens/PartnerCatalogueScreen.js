@@ -10,8 +10,8 @@ import {
   Dimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import Header from '../Component/Header';
-import AccordionItem from '../Component/AccordionItem';
+import Header from '../../Component/Header';
+import AccordionItem from '../../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/AntDesign';
 
@@ -23,19 +23,18 @@ const PartnerCatalogueScreen = () => {
   const navigation = useNavigation();
 
   const images = [
-    require('../assets/Images/Carosuel1.png'),
-    require('../assets/Images/Carosuel2.png'),
-    require('../assets/Images/Carosuel3.png'),
-    require('../assets/Images/Carosuel4.png'),
-    require('../assets/Images/Carosuel4.png'),
-    require('../assets/Images/Carosuel4.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'), 
+     require('../../assets/Images/Carosuel1.png'), 
+      require('../../assets/Images/Carosuel1.png'),
+      require('../../assets/Images/Carosuel1.png'),
   ];
 
   const customerPhotos = [
-    require('../assets/Images/Carosuel1.png'),
-    require('../assets/Images/Carosuel2.png'),
-    require('../assets/Images/Carosuel3.png'),
-    require('../assets/Images/Carosuel4.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
   ];
 
   const customerReviews = [
@@ -64,14 +63,10 @@ const PartnerCatalogueScreen = () => {
 
   // Suggestion images from local assets
   const suggestionImages = [
-    require('../assets/Images/Carosuel1.png'),
-    require('../assets/Images/Carosuel2.png'),
-    require('../assets/Images/Carosuel3.png'),
-    require('../assets/Images/Carosuel4.png'),
-    require('../assets/Images/Carosuel1.png'),
-    require('../assets/Images/Carosuel2.png'),
-    require('../assets/Images/Carosuel3.png'),
-    require('../assets/Images/Carosuel4.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
   ];
 
   return (

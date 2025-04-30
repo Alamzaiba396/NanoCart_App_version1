@@ -16,7 +16,7 @@ const MyAccountScreen = () => {
 
   const fetchProfile = async () => {
     try {
-      console.log('📦 Fetching Profile API...');
+      console.log(' Fetching Profile API...');
       const response = await fetch('http://10.0.2.2:4000/api/auth/profile', {
         method: 'GET',
         headers: {
@@ -34,7 +34,7 @@ const MyAccountScreen = () => {
         console.warn('⚠️ Failed to fetch name.');
       }
     } catch (error) {
-      console.log('🔥 Error fetching profile:', error);
+      console.log(' Error fetching profile:', error);
     }
   };
 
