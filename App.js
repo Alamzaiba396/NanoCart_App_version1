@@ -27,6 +27,14 @@ import PartnerCatalogueScreen from "./Src/Partner/Screens/PartnerCatalogueScreen
 import WishlistScreen from "./Src/Screen/WishlistScreen";
 import SavedAddressScreen from "./Src/Screen/SavedAddressScreen";
 import PartnerRegisterScreen from "./Src/Partner/Screens/PartnerRegisterScreen";
+import PartnerAccountScreen from "./Src/Partner/Screens/PartnerAccountScreen";
+import PartnerVerificationScreen from "./Src/Partner/Screens/PartnerVerificationScreen";
+import PartnerSearchCategory from "./Src/Partner/Screens/PartnerSearchCategory";
+import PartnerSubCategoryScreen from "./Src/Partner/Screens/PartnerSubcategoryScreen";
+import PartnerOrderConfirmationScreen from "./Src/Partner/Screens/PartnerOrderConfirmScreen";
+import PartnerOrderHistoryScreen from "./Src/Partner/Screens/PartnerOrderHistoryScreen";
+import PartnerHomeScreen from "./Src/Partner/Screens/PartnerHomeScreen";
+import PartnerWalletScreen from "./Src/Partner/Screens/PartnerWalletScreen";
 
 
 const Stack = createStackNavigator();
@@ -56,9 +64,41 @@ const App = () => {
         <Stack.Screen name="LoginVerifyOtp" component={LoginVerifyOtpScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
-       
-        <Stack.Screen name="PartnerCatalogue" component={PartnerCatalogueScreen} />
+  
+        <Stack.Screen
+            name="PartnerAccount"
+            component={PartnerAccountScreen}
+          />
+          <Stack.Screen
+            name="PartnerRegister"
+            component={PartnerRegisterScreen}
+          />
+          <Stack.Screen
+            name="PatnerVerification"
+            component={PartnerVerificationScreen}
+          />
+          <Stack.Screen
+            name="PartnerCatalogue"
+            component={PartnerCatalogueScreen}
+          />
+          <Stack.Screen name="PartnerHome" component={PartnerHomeScreen} />
+          <Stack.Screen
+            name="PartnerSearchCategory"
+            component={PartnerSearchCategory}
+          />
+          <Stack.Screen
+            name="PartnerSubCategory"
+            component={PartnerSubCategoryScreen}
+          />
+          <Stack.Screen name="PartnerWallet" component={PartnerWalletScreen} />
+          <Stack.Screen
+            name="PartnerOrderConfirmation"
+            component={PartnerOrderConfirmationScreen}
+          />
+          <Stack.Screen
+            name="PartnerOrderHistory"
+            component={PartnerOrderHistoryScreen}
+          />
         <Stack.Screen name="Saved" component={SavedAddressScreen} />
       </Stack.Navigator>
       </Provider>

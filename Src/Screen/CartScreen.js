@@ -3,7 +3,6 @@ import {
   View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
   Modal, TouchableWithoutFeedback
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCartItems } from '../redux/reducers/cartSlice';
@@ -137,6 +136,43 @@ const CartScreen = ({ navigation }) => {
   const couponDiscount = 200;
   const gstAmount = (discountedTotal * 0.135).toFixed(1);
 
+
+  const [invoiceData, setInvoiceData] = useState({
+    gst: '0%',
+    coupon_discount: '₹0',
+    shipping_charge: '₹0',
+    total_amount: '₹0',
+  });
+  
+  useEffect(() => {
+    fetchInvoiceData();
+  }, []);
+  
+  const fetchInvoiceData = async () => {
+    try {
+      const res = await fetch('http://10.0.2.2:4000/api/invoice');
+      const json = await res.json();
+  
+      if (res.ok && json.success) {
+        const invoice = json.data[0].invoice;
+        const getValue = (key) =>
+          invoice.find((item) => item.key === key)?.values || '₹0';
+  
+        setInvoiceData({
+          gst: getValue('gst'),
+          coupon_discount: getValue('coupon_discount'),
+          shipping_charge: getValue('shipping_charge'),
+          total_amount: getValue('total_amount'),
+        });
+      } else {
+        console.warn('❌ Failed to fetch invoice:', json.message);
+      }
+    } catch (err) {
+      console.error('🔥 Error fetching invoice:', err.message);
+    }
+  };
+  
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
@@ -222,13 +258,33 @@ const CartScreen = ({ navigation }) => {
 
         {/* Price Details */}
         <View style={styles.priceCard}>
-          <Text style={styles.priceTitle}>Price Details ({cartItems.length} items)</Text>
-          <View style={styles.priceRow}><Text>Cart Total</Text><Text>₹{cartTotalMRP}</Text></View>
-          <View style={styles.priceRow}><Text>Discounted Price</Text><Text>₹{discountedTotal}</Text></View>
-          <View style={styles.priceRow}><Text style={styles.orange}>Coupon Discount</Text><Text style={styles.orange}>- ₹{couponDiscount}</Text></View>
-          <View style={styles.priceRow}><Text>GST</Text><Text>₹{gstAmount}</Text></View>
-          <View style={styles.priceRow}><Text>Shipping Charges</Text><Text style={styles.orange}>FREE</Text></View>
-        </View>
+  <Text style={styles.priceTitle}>Price Details ({cartItems.length} items)</Text>
+  <View style={styles.priceRow}>
+    <Text>Cart Total</Text>
+    <Text>₹{cartTotalMRP}</Text>
+  </View>
+  <View style={styles.priceRow}>
+    <Text>Discounted Price</Text>
+    <Text>₹{discountedTotal}</Text>
+  </View>
+  <View style={styles.priceRow}>
+    <Text style={styles.orange}>Coupon Discount</Text>
+    <Text style={styles.orange}>- {invoiceData.coupon_discount}</Text>
+  </View>
+  <View style={styles.priceRow}>
+    <Text>GST</Text>
+    <Text>{invoiceData.gst}</Text>
+  </View>
+  <View style={styles.priceRow}>
+    <Text>Shipping Charges</Text>
+    <Text>{invoiceData.shipping_charge}</Text>
+  </View>
+  <View style={[styles.priceRow, { borderTopWidth: 1, paddingTop: 8, marginTop: 6, borderColor: '#ddd' }]}>
+    <Text style={{ fontWeight: 'bold' }}>Total Payable</Text>
+    <Text style={{ fontWeight: 'bold' }}>{invoiceData.total_amount}</Text>
+  </View>
+</View>
+
 
         {/* Continue Button */}
         <TouchableOpacity style={styles.continueBtn} onPress={handleContinuePress}>

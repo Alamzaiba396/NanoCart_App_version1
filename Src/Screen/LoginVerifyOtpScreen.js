@@ -7,11 +7,7 @@ const screenWidth = Dimensions.get('window').width;
 
   const LoginVerifyOtpScreen = ({ route,navigation }) => {
     const { fromScreen, actionAfterLogin, itemId ,phone} = route.params;
-
-  const dispatch = useDispatch();
-
-
-    
+    const dispatch = useDispatch();
     console.log("Phone:", phone);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
@@ -144,12 +140,48 @@ const screenWidth = Dimensions.get('window').width;
           ))}
         </View>
 
-        <Text style={styles.resendText}>
+        {/* <Text style={styles.resendText}>
           Didn't receive OTP?{' '}
           <Text style={styles.resendLink} onPress={() => Alert.alert("Resend", "OTP resent successfully!")}>
             Resend
           </Text>
-        </Text>
+        </Text> */}
+
+
+<Text style={styles.resendText}>
+  Didn't receive OTP?{' '}
+  <Text
+    style={styles.resendLink}
+    onPress={async () => {
+      try {
+        const response = await fetch("http://10.0.2.2:4000/api/auth/otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phoneNumber: phone,
+          }),
+        });
+
+        const data = await response.json();
+        console.log("Resend OTP Response:", data);
+
+        if (response.ok && data.success) {
+          Alert.alert("Success", "OTP resent successfully!");
+        } else {
+          Alert.alert("Error", data.message || "Failed to resend OTP.");
+        }
+      } catch (error) {
+        console.error("Resend OTP Error:", error);
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      }
+    }}
+  >
+    Resend
+  </Text>
+</Text>
+
       </View>
 
       <View style={styles.bottomSection}>

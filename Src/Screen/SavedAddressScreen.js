@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -46,17 +45,14 @@ const SavedAddressesScreen = ({ navigation }) => {
     }
   }, [token]);
 
-  // ⬇ Render address card with navigation to edit
   const renderAddressBox = (item) => (
     <TouchableOpacity
       key={item._id}
       style={styles.addressBox}
       onPress={() => {
-        console.log('Navigating to Edit:', item);
         navigation.navigate('edit', {
-          isEdit: true,
-          addressId: item._id, 
-          address: item,       
+          addressId: item._id,   // ✅ This is the correct addressDetail._id
+          address: item
         });
       }}
     >
@@ -79,7 +75,6 @@ const SavedAddressesScreen = ({ navigation }) => {
 
       {/* Address List */}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Default Address */}
         {defaultAddress && (
           <>
             <Text style={styles.sectionTitle}>Default Address</Text>
@@ -87,7 +82,6 @@ const SavedAddressesScreen = ({ navigation }) => {
           </>
         )}
 
-        {/* More Addresses */}
         {otherAddresses.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>More Addresses</Text>
@@ -96,7 +90,7 @@ const SavedAddressesScreen = ({ navigation }) => {
         )}
       </ScrollView>
 
-      {/* Add New Address Button */}
+      {/* Add New Address */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddNewAddress')}
@@ -120,7 +114,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 18, fontWeight: 'bold', marginLeft: 10 },
   content: { padding: 16, paddingBottom: 100 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', marginVertical: 10, color: '#555' },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color: '#555',
+  },
   addressBox: {
     backgroundColor: '#f7f7f7',
     padding: 12,

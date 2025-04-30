@@ -14,7 +14,7 @@ const screenWidth = Dimensions.get('window').width;
     console.log("Email:", email);
     console.log("Phone:", phone);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const inputs = useRef([]);
+  const inputs = useRef([]);  
   
   const handleOTPChange = (value, index) => {
     if (isNaN(value)) return;
@@ -39,67 +39,7 @@ const screenWidth = Dimensions.get('window').width;
     console.log("Route params at OTP screen:", route?.params);
   }, []);
 
-  // const handleVerifyOTP = async () => {
-  //   const enteredOTP = otp.join("");
-  
-  //   if (enteredOTP.length !== 6) {
-  //     Alert.alert("Error", "Please enter a valid 6-digit OTP.");
-  //     return;
-  //   }
-  
-  //   const { name, email, phone } = route.params; // Use name, email, and phone from route.params
-  
-  //   try {
-  //     console.log("Verifying OTP with:", { phoneNumber: phone, otp: enteredOTP });
-  
-  //     const verifyResponse = await fetch("http://10.0.2.2:4000/api/auth/otp/verify", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         phoneNumber: phone,
-  //         otp: enteredOTP,
-  //       }),
-  //     });
-  
-  //     const verifyData = await verifyResponse.json();
-  //     console.log("OTP Verify Response:", verifyData);
-  
-  //     if (verifyResponse.ok && verifyData.success) {
-  //       // Proceed with signup
-  //       const signupResponse = await fetch("http://10.0.2.2:4000/api/auth/signup", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           name:name, 
-  //           phoneNumber: phone, 
-  //           email:email,
-  //         }),
-  //       });
-  
-  //       const signupData = await signupResponse.json();
-  
-  //       if (signupResponse.ok && signupData.success) {
-  //         Alert.alert("Success", "Signup successful!", [
-  //           { text: "OK", onPress: () => navigation.navigate("Cart") },
-  //         ]);
-  //       } else {
-  //         Alert.alert("Signup Failed", signupData.message || "Something went wrong during signup.");
-  //       }
-  //     } else if (verifyData.message === "OTP expired") {
-  //       Alert.alert("Error", "Your OTP has expired. Please request a new one.");
-  //     } else {
-  //       Alert.alert("OTP Verification Failed", verifyData.message || "Invalid OTP.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     Alert.alert("Error", "Something went wrong. Please try again.");
-  //   }
-  // };
-  
+ 
 
   const handleVerifyOTP = async () => {
     const enteredOTP = otp.join("");
@@ -152,7 +92,7 @@ const screenWidth = Dimensions.get('window').width;
           console.log("✅ Signup successful. Token stored in Redux:", token);
   
           Alert.alert("Success", "Signup successful!", [
-            { text: "OK", onPress: () => navigation.navigate("Cart") },
+            { text: "OK", onPress: () => navigation.navigate("Home") },
           ]);
         } else {
           Alert.alert("Signup Failed", signupData.message || "Something went wrong during signup.");
@@ -199,11 +139,37 @@ const screenWidth = Dimensions.get('window').width;
         </View>
 
         <Text style={styles.resendText}>
-          Didn't receive OTP?{' '}
-          <Text style={styles.resendLink} onPress={() => Alert.alert("Resend", "OTP resent successfully!")}>
-            Resend
-          </Text>
-        </Text>
+  Didn't receive OTP?{' '}
+  <Text
+    style={styles.resendLink}
+    onPress={async () => {
+      try {
+        const response = await fetch("http://10.0.2.2:4000/api/auth/otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phoneNumber: phone }),
+        });
+
+        const data = await response.json();
+        console.log("Resend OTP Response:", data);
+
+        if (response.ok && data.success) {
+          Alert.alert("Success", "OTP resent successfully!");
+        } else {
+          Alert.alert("Error", data.message || "Failed to resend OTP.");
+        }
+      } catch (error) {
+        console.error("Resend OTP Error:", error);
+        Alert.alert("Error", "Network error. Please try again.");
+      }
+    }}
+  >
+    Resend
+  </Text>
+</Text>
+
       </View>
 
       <View style={styles.bottomSection}>

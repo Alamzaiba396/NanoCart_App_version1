@@ -99,7 +99,7 @@ const RegisterScreen = ({ navigation }) => {
                 onChangeText={setName}
               />
 
-{isEditingPhone ? (
+{/* {isEditingPhone ? (
   <TextInput
     style={styles.input}
     placeholder="Phone Number*"
@@ -113,7 +113,18 @@ const RegisterScreen = ({ navigation }) => {
   <TouchableOpacity onPress={() => setIsEditingPhone(true)}>
     <Text style={styles.staticPhone}>{phone ? `+91 – ${phone}` : '+91 – 6370100190'}</Text>
   </TouchableOpacity>
-)}
+)} */}
+
+
+<TextInput
+  style={styles.input}
+  placeholder="Phone Number*"
+  placeholderTextColor="#aaa"
+  value={phone}
+  onChangeText={setPhone}
+  keyboardType="phone-pad"
+/>
+
               <TextInput
                 style={styles.input}
                 placeholder="E-mail ID*"
