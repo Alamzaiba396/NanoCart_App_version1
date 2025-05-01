@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   TouchableWithoutFeedback,
   View,
@@ -8,12 +8,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import Header from '../../Component/Header';
 import AccordionItem from '../../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Icon1 from 'react-native-vector-icons/AntDesign';
+import Icon1 from 'react-native-vector-icons/Ionicons';
 
 import {useNavigation} from '@react-navigation/native';
 
@@ -21,13 +22,26 @@ const {width} = Dimensions.get('window');
 
 const PartnerCatalogueScreen = () => {
   const navigation = useNavigation();
+  const [quantity, setQuantity] = useState(0);
+  const pricePerPiece = 0;
+
+  const priceData = [
+    {range: '1-10 pcs', price: '₹140.00'},
+    {range: '11-30 pcs', price: '₹130.00'},
+    {range: '31-60 pcs', price: '₹120.00'},
+    {range: '61-100 pcs', price: '₹110.00'},
+    {range: '> 100 pcs', price: '₹100.00'},
+  ];
+
+  const increment = () => setQuantity(prev => prev + 1);
+  const decrement = () => setQuantity(prev => (prev > 0 ? prev - 1 : 0));
 
   const images = [
     require('../../assets/Images/Carosuel1.png'),
-    require('../../assets/Images/Carosuel1.png'), 
-     require('../../assets/Images/Carosuel1.png'), 
-      require('../../assets/Images/Carosuel1.png'),
-      require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
+    require('../../assets/Images/Carosuel1.png'),
   ];
 
   const customerPhotos = [
@@ -62,11 +76,19 @@ const PartnerCatalogueScreen = () => {
   ];
 
   // Suggestion images from local assets
-  const suggestionImages = [
-    require('../../assets/Images/Carosuel1.png'),
-    require('../../assets/Images/Carosuel1.png'),
-    require('../../assets/Images/Carosuel1.png'),
-    require('../../assets/Images/Carosuel1.png'),
+  const suggestions = [
+    {
+      image: require('../../assets/Images/card2.png'),
+    },
+    {
+      image: require('../../assets/Images/card3.png'),
+    },
+    {
+      image: require('../../assets/Images/card2.png'),
+    },
+    {
+      image: require('../../assets/Images/card3.png'),
+    },
   ];
 
   return (
@@ -80,7 +102,7 @@ const PartnerCatalogueScreen = () => {
 
         <View style={styles.imageSection}>
           <TouchableWithoutFeedback
-            onPress={() => navigation.navigate('ProductDetailPhoto')}>
+            onPress={() => navigation.navigate('PartnerProductDetailPhoto')}>
             <Image
               source={images[0]}
               style={styles.mainImage}
@@ -109,10 +131,10 @@ const PartnerCatalogueScreen = () => {
             <Text style={styles.shareText}>
               Catalogue{' '}
               <Icon1
-                name="<DownloadOutlined />"
-                size={16}
-                color="#fff"
-                style={{marginLeft: 20}}
+                name="download"
+                size={20}
+                color="#000"
+                style={{padding: 5}}
               />
             </Text>
           </View>
@@ -179,10 +201,63 @@ const PartnerCatalogueScreen = () => {
           </Text>
         </AccordionItem>
 
+        <AccordionItem title="Pricing Per Qunatity">
+          <View style={styles.price}>
+            {priceData.map((item, index) => (
+              <View key={index} style={styles.pricerow}>
+                <Text style={styles.rangeText}>{item.range}</Text>
+                <Text style={styles.priceText}>{item.price}</Text>
+              </View>
+            ))}
+          </View>
+        </AccordionItem>
+
+        <AccordionItem title="Choose Items">
+          <Text style={styles.chooseItemstext}>Select Quantity</Text>
+          <View style={styles.chooseItemcolors}>
+            {['green', 'red', 'black', 'navy', 'gold'].map((color, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.chooseItemcolorBox, {backgroundColor: color}]}
+              />
+            ))}
+          </View>
+          <View style={styles.chooseItemContainer}>
+            {/* Stepper */}
+            <View style={styles.stepper}>
+              <TouchableOpacity onPress={decrement} style={styles.button}>
+                <Text style={styles.arrow}>▼</Text>
+              </TouchableOpacity>
+              <Text style={styles.quantity}>{quantity}</Text>
+              <TouchableOpacity onPress={increment} style={styles.button}>
+                <Text style={styles.arrow}>▲</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.totalValue}>
+              {/* Labels */}
+              <View style={styles.row}>
+                <Text style={styles.label}>Total Qty.</Text>
+                <Text style={styles.label}>Price / Pcs</Text>
+                <Text style={styles.label}>Total Price</Text>
+              </View>
+
+              {/* Values */}
+              <View style={styles.row}>
+                <Text style={styles.value}>{quantity}</Text>
+                <Text style={styles.value}>{pricePerPiece}</Text>
+                <Text style={styles.value}>{quantity * pricePerPiece}</Text>
+              </View>
+            </View>
+          </View>
+        </AccordionItem>
+
         <AccordionItem title="Check Delivery at Your Pincode">
-          <Text>
-            Enter your pincode to check delivery options and estimated time.
-          </Text>
+          <View style={styles.checkPincode}>
+            <TextInput placeholder="Enter Pincode" />
+            <TouchableOpacity style={styles.checkPincodebtn}>
+              <Text style={styles.checkPincodetext}>CHECK</Text>
+            </TouchableOpacity>
+          </View>
         </AccordionItem>
 
         <AccordionItem title="Return Policies">
@@ -201,11 +276,11 @@ const PartnerCatalogueScreen = () => {
                   key={index}
                   name="star"
                   size={16}
-                  color="#F57C00"
+                  color="#d86427"
                   style={styles.starIcon}
                 />
               ))}
-              <Icon name="star-half-empty" size={16} color="#F57C00" />
+              <Icon name="star-half-empty" size={16} color="#d86427" />
             </View>
             <View style={styles.ratingTextRow}>
               <Text style={styles.ratingText}>121 Ratings</Text>
@@ -247,12 +322,12 @@ const PartnerCatalogueScreen = () => {
                       key={i}
                       name="star"
                       size={14}
-                      color="#F57C00"
+                      color="#d86427"
                       style={styles.starIcon}
                     />
                   ))}
                   {review.rating % 1 !== 0 && (
-                    <Icon name="star-half-empty" size={14} color="#F57C00" />
+                    <Icon name="star-half-empty" size={14} color="#d86427" />
                   )}
                 </View>
                 <Text style={styles.reviewName}>{review.name}</Text>
@@ -269,20 +344,16 @@ const PartnerCatalogueScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* You Might Also Like Section */}
+        {/* Suggestions Section */}
         <View style={styles.suggestionSection}>
           <Text style={styles.suggestionTitle}>You might also like</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.suggestionContainer}>
-            {suggestionImages.map((image, index) => (
+            {suggestions.map((item, index) => (
               <View key={index} style={styles.suggestionCard}>
-                <Image
-                  source={image}
-                  style={styles.suggestionImage}
-                  resizeMode="cover"
-                />
+                <Image source={item.image} style={styles.suggestionImage} />
                 <TouchableOpacity style={styles.shopNowButton}>
                   <Text style={styles.shopNowText}>SHOP NOW</Text>
                 </TouchableOpacity>
@@ -298,7 +369,7 @@ const PartnerCatalogueScreen = () => {
             <Icon
               name="heart"
               size={16}
-              color="#F57C00"
+              color="#d86427"
               style={styles.buttonIcon}
             />
             <Text style={styles.buttonText}>WISHLIST</Text>
@@ -350,7 +421,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   discount: {
-    color: '#F57C00',
+    color: '#d86427',
     marginLeft: 8,
     fontSize: 14,
   },
@@ -366,7 +437,7 @@ const styles = StyleSheet.create({
   },
   sizeChartText: {
     fontSize: 14,
-    color: '#F57C00',
+    color: '#d86427',
     textDecorationLine: 'underline',
   },
   sizeOptions: {
@@ -428,7 +499,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 3,
   },
   colorsText: {
     fontSize: 14,
@@ -437,11 +508,13 @@ const styles = StyleSheet.create({
   },
   shareContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    paddingRight: 15,
   },
   shareText: {
     fontSize: 14,
-    color: 'black',
+    color: '#000',
   },
   colors: {
     flexDirection: 'row',
@@ -585,54 +658,57 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   seeMoreText: {
-    color: '#F57C00',
+    color: '#d86427',
     fontSize: 14,
     fontWeight: 'bold',
   },
-  // Suggestion Styles
   suggestionSection: {
-    marginTop: 20,
-    marginBottom: 10,
+    paddingVertical: 15,
   },
   suggestionTitle: {
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 14,
+    paddingBottom: 10,
     marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#aaa',
   },
   suggestionContainer: {
+    flexDirection: 'row',
     paddingVertical: 5,
     paddingRight: 10,
   },
   suggestionCard: {
-    width: 150,
-    height: 250,
-    marginRight: 10,
-    borderRadius: 10,
-    overflow: 'hidden',
+    width: (2 * width) / 3,
+    height: 350,
     borderWidth: 1,
     borderColor: '#ddd',
-    position: 'relative',
+    marginBottom: 10,
+    marginRight: 10,
   },
   suggestionImage: {
+    position: 'relative',
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
   },
   shopNowButton: {
     position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 5,
-    borderRadius: 5,
+    bottom: 30,
+    left: 70,
+    right: 70,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#fff',
   },
   shopNowText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
   },
   placeholderText: {
     color: 'gray',
@@ -651,9 +727,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#F57C00',
+    borderColor: '#d86427',
     paddingVertical: 10,
-    borderRadius: 5,
     marginRight: 5,
   },
   addToCartButton: {
@@ -661,17 +736,112 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F57C00',
+    backgroundColor: '#d86427',
     paddingVertical: 10,
-    borderRadius: 5,
     marginLeft: 5,
   },
   buttonIcon: {
     marginRight: 5,
   },
   buttonText: {
-    color: '#F57C00',
+    color: '#d86427',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  price: {
+    paddingHorizontal: 80,
+  },
+  pricerow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  rangeText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  priceText: {
+    fontSize: 16,
+    color: '#e66b00',
+    fontWeight: '600',
+  },
+  chooseItemstext: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  chooseItemcolorBox: {
+    width: 50,
+    height: 35,
+    marginRight: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  chooseItemcolors: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  chooseItemContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  stepper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  totalValue: {
+    padding: 0,
+    borderTopWidth: 1,
+  },
+  button: {
+    backgroundColor: '#D6722F',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  arrow: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  quantity: {
+    marginHorizontal: 80,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
+  },
+  label: {
+    fontSize: 16,
+    color: '#000',
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  checkPincode: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  checkPincodebtn: {
+    backgroundColor: '#d86427',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 0,
+  },
+  checkPincodetext: {
+    fontSize: 16,
+    color: '#fff',
   },
 });

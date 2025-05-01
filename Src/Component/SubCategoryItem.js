@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,57 +8,64 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
-  import { useSelector } from "react-redux";
+import {useSelector} from 'react-redux';
 
-const SubCategoryItem = ({ item, navigation }) => {
-  const token = useSelector((state) => state.auth.token);
+const SubCategoryItem = ({item, navigation}) => {
+  const token = useSelector(state => state.auth.token);
 
   const [showModal, setShowModal] = useState(false);
 
   const handleHeartPress = () => {
-    console.log(" Heart icon pressed.");
-    console.log(" Current token value:", token);
-  
+    console.log(' Heart icon pressed.');
+    console.log(' Current token value:', token);
+
     if (!item || !item.itemId) {
-      console.warn(" Item or itemId is undefined!", item);
+      console.warn(' Item or itemId is undefined!', item);
     } else {
-      console.log(" Item ID:", item.itemId);
+      console.log(' Item ID:', item.itemId);
     }
-  
+
     if (!token) {
-      console.log(" No token found. Navigating to Login screen...");
-      navigation.navigate("Login", {
-        fromScreen: "SubCategoryScreen",
-        actionAfterLogin: "like_item",
+      console.log(' No token found. Navigating to Login screen...');
+      navigation.navigate('Login', {
+        fromScreen: 'SubCategoryScreen',
+        actionAfterLogin: 'like_item',
         itemId: item?.itemId,
       });
     } else {
-      console.log(" Token found. Proceeding to add to wishlist...");
-      console.log(" Added to wishlist:", item.itemId);
+      console.log(' Token found. Proceeding to add to wishlist...');
+      console.log(' Added to wishlist:', item.itemId);
       // API call or Redux action to add to wishlist goes here
     }
   };
-  
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
   const handleLogin = () => {
     setShowModal(false);
-    navigation.navigate('Login', { fromScreen: 'SubCategoryItem' })
+    navigation.navigate('Login', {fromScreen: 'SubCategoryItem'});
   };
 
   return (
     <>
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate('ProductDetail', { itemId: item.itemId })}
-      >
+        onPress={
+          () => navigation.navigate('ProductDetail', {itemId: item.itemId})
+          // navigation.navigate('PartnerCatalogue', {itemId: item.itemId})
+        }>
         <Image source={item.image} style={styles.image} />
         <TouchableOpacity style={styles.heartIcon} onPress={handleHeartPress}>
-          <Image source={require('../assets/Images/Heart.png')} style={{ width: 18, height: 18 }} />
+          <Image
+            source={require('../assets/Images/Heart.png')}
+            style={{width: 18, height: 18}}
+          />
         </TouchableOpacity>
-        <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
+        <Text numberOfLines={1} style={styles.title}>
+          {item.name}
+        </Text>
         <Text style={styles.subtitle}>{item.description}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.mrp}>MRP ₹{item.mrp}</Text>
@@ -73,15 +79,23 @@ const SubCategoryItem = ({ item, navigation }) => {
       </TouchableOpacity>
 
       {/* Modal for "Uh-oh" */}
-      <Modal transparent visible={showModal} animationType="fade" onRequestClose={handleCloseModal}>
+      <Modal
+        transparent
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={handleCloseModal}>
         <TouchableWithoutFeedback onPress={handleCloseModal}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.modalBox}>
                 <Text style={styles.modalTitle}>Uh-oh!</Text>
-                <Text style={styles.modalText}>Looks like you haven't logged in!</Text>
+                <Text style={styles.modalText}>
+                  Looks like you haven't logged in!
+                </Text>
 
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={handleLogin}>
                   <Text style={styles.loginButtonText}>LOGIN TO CONTINUE</Text>
                 </TouchableOpacity>
 
@@ -97,8 +111,53 @@ const SubCategoryItem = ({ item, navigation }) => {
     </>
   );
 };
-
 const styles = StyleSheet.create({
+  // same styles as before...
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  closeIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 15,
+  },
+  modalButton: {
+    backgroundColor: '#f37022',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalHelpText: {
+    color: '#888',
+    fontSize: 13,
+    marginTop: 5,
+  },
   card: {
     width: '47%',
     backgroundColor: '#fff',

@@ -37,6 +37,7 @@ import PartnerOrderConfirmationScreen from './Src/Partner/Screens/PartnerOrderCo
 import PartnerOrderHistoryScreen from './Src/Partner/Screens/PartnerOrderHistoryScreen';
 import PartnerAccountScreen from './Src/Partner/Screens/PartnerAccountScreen';
 import PartnerVerificationScreen from './Src/Partner/Screens/PartnerVerificationScreen';
+import PartnerProductDetailPhotoScreen from './Src/Partner/Screens/PartnerProductDetailPhotoScreen';
 
 const Stack = createStackNavigator();
 const App = () => {
@@ -104,6 +105,10 @@ const App = () => {
           <Stack.Screen
             name="PartnerOrderHistory"
             component={PartnerOrderHistoryScreen}
+          />
+          <Stack.Screen
+            name="PartnerProductDetailPhoto"
+            component={PartnerProductDetailPhotoScreen}
           />
 
           <Stack.Screen name="Saved" component={SavedAddressScreen} />

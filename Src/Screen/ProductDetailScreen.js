@@ -1,4 +1,4 @@
-import { useRoute, useNavigation } from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import Header from '../Component/Header';
 import AccordionItem from '../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -14,18 +14,18 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToWishlist } from '../redux/reducers/wishlistSlice';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {addToWishlist} from '../redux/reducers/wishlistSlice';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const ProductDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-const token = useSelector(state => state.auth.token);
-  const { itemId } = route.params;
+  const token = useSelector(state => state.auth.token);
+  const {itemId} = route.params;
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [selectedColorImages, setSelectedColorImages] = useState([]);
@@ -34,7 +34,9 @@ const token = useSelector(state => state.auth.token);
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const res = await fetch(`http://10.0.2.2:4000/api/itemDetails/${itemId}`);
+        const res = await fetch(
+          `http://10.0.2.2:4000/api/itemDetails/${itemId}`,
+        );
         const json = await res.json();
         if (json.data && json.data.length > 0) {
           const productData = json.data[0];
@@ -51,31 +53,61 @@ const token = useSelector(state => state.auth.token);
       }
     };
 
-    fetchProductDetails(); 
+    fetchProductDetails();
   }, [itemId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+    return <ActivityIndicator size="large" style={{marginTop: 50}} />;
   }
 
   if (!product) {
-    return <Text style={{ textAlign: 'center', marginTop: 50 }}>No product found</Text>;
+    return (
+      <Text style={{textAlign: 'center', marginTop: 50}}>No product found</Text>
+    );
   }
 
-  const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure } = product;
+  const {
+    itemId: itemInfo,
+    imagesByColor,
+    sizeChart,
+    deliveryDescription,
+    returnPolicy,
+    About,
+    isSize,
+    howToMeasure,
+  } = product;
 
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView contentContainerStyle={{ paddingBottom: 180 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{paddingBottom: 180}}
+        showsVerticalScrollIndicator={false}>
         {/* Main Image & Thumbnails */}
         <View style={styles.imageSection}>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('ProductDetailPhoto', { images: selectedColorImages })}>
-            <Image source={{ uri: selectedColorImages[0]?.url }} style={styles.mainImage} resizeMode="cover" />
+          <TouchableWithoutFeedback
+            onPress={() =>
+              navigation.navigate('ProductDetailPhoto', {
+                images: selectedColorImages,
+              })
+            }>
+            <Image
+              source={{uri: selectedColorImages[0]?.url}}
+              style={styles.mainImage}
+              resizeMode="cover"
+            />
           </TouchableWithoutFeedback>
-          <ScrollView style={styles.sideImages} showsVerticalScrollIndicator={true}>
+
+          <ScrollView
+            style={styles.sideImages}
+            showsVerticalScrollIndicator={true}>
             {selectedColorImages.slice(1).map((img, idx) => (
-              <Image key={idx} source={{ uri: img.url }} style={styles.thumbnail} resizeMode="cover" />
+              <Image
+                key={idx}
+                source={{uri: img.url}}
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
             ))}
           </ScrollView>
         </View>
@@ -85,7 +117,12 @@ const token = useSelector(state => state.auth.token);
           <Text style={styles.colorsText}>Colors</Text>
           <View style={styles.shareContainer}>
             <Text style={styles.shareText}>SHARE</Text>
-            <Feather name="share-2" size={16} color="black" style={{ marginLeft: 5 }} />
+            <Feather
+              name="share-2"
+              size={16}
+              color="black"
+              style={{marginLeft: 5}}
+            />
           </View>
         </View>
 
@@ -99,7 +136,7 @@ const token = useSelector(state => state.auth.token);
                 setSelectedColorImages(colorObj.images);
                 setSizes(colorObj.sizes);
               }}>
-              <Text style={{ fontSize: 10 }}>{colorObj.color}</Text>
+              <Text style={{fontSize: 10}}>{colorObj.color}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -111,7 +148,9 @@ const token = useSelector(state => state.auth.token);
           <View style={styles.priceRow}>
             <Text style={styles.strikeThrough}>₹{itemInfo.MRP}</Text>
             <Text style={styles.price}> ₹{itemInfo.discountedPrice}</Text>
-            <Text style={styles.discount}>({Math.round(itemInfo.discountPercentage)}% off)</Text>
+            <Text style={styles.discount}>
+              ({Math.round(itemInfo.discountPercentage)}% off)
+            </Text>
           </View>
           <Text style={styles.delivery}>{deliveryDescription}</Text>
         </View>
@@ -121,7 +160,10 @@ const token = useSelector(state => state.auth.token);
           <View style={styles.priceSizeSection}>
             <View style={styles.sizeRow}>
               <Text style={styles.sizeText}>Select a size</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('SizeChart', { sizeChart, howToMeasure })}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('SizeChart', {sizeChart, howToMeasure})
+                }>
                 <Text style={styles.sizeChartText}>SIZE CHART</Text>
               </TouchableOpacity>
             </View>
@@ -149,7 +191,7 @@ const token = useSelector(state => state.auth.token);
             const [key] = Object.keys(item);
             return (
               <View key={idx}>
-                <Text style={{ fontWeight: 'bold' }}>{key.toUpperCase()}</Text>
+                <Text style={{fontWeight: 'bold'}}>{key.toUpperCase()}</Text>
                 <Text>{item[key]}</Text>
               </View>
             );
@@ -159,155 +201,158 @@ const token = useSelector(state => state.auth.token);
 
       {/* Sticky Buttons at Bottom */}
       <View style={styles.bottomButtons}>
- 
-<TouchableOpacity
-  style={styles.wishlistButton}
-  onPress={async () => {
-    console.log(' Wishlist button pressed');
+        <TouchableOpacity
+          style={styles.wishlistButton}
+          onPress={async () => {
+            console.log(' Wishlist button pressed');
 
-    if (!token) {
-      console.log(' No token found. Redirecting to login screen...');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
+            if (!token) {
+              console.log(' No token found. Redirecting to login screen...');
+              navigation.navigate('Login', {
+                fromScreen: 'ProductDetail',
+                itemId: product.itemId._id,
+              });
+              return;
+            }
 
-    console.log(' Token found:', token);
+            console.log(' Token found:', token);
 
-    const colorObj = imagesByColor.find(colorSet =>
-      colorSet.images.some(img => img.url === selectedColorImages[0]?.url)
-    );
-    const selectedColor = colorObj?.color || 'Black';
+            const colorObj = imagesByColor.find(colorSet =>
+              colorSet.images.some(
+                img => img.url === selectedColorImages[0]?.url,
+              ),
+            );
+            const selectedColor = colorObj?.color || 'Black';
 
-    console.log(' Selected color:', selectedColor);
-    console.log(' Item ID:', product.itemId._id);
+            console.log(' Selected color:', selectedColor);
+            console.log(' Item ID:', product.itemId._id);
 
-    const payload = {
-      itemId: product.itemId._id,
-      color: selectedColor,
-    };
+            const payload = {
+              itemId: product.itemId._id,
+              color: selectedColor,
+            };
 
-    console.log(' Request Payload:', payload);
+            console.log(' Request Payload:', payload);
 
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+            try {
+              const response = await fetch(
+                'http://10.0.2.2:4000/api/userwishlist/create',
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(payload),
+                },
+              );
 
-      console.log(' Wishlist API Response Status:', response.status);
+              console.log(' Wishlist API Response Status:', response.status);
 
-      const data = await response.json();
-      console.log(' Wishlist API Response Data:', data);
+              const data = await response.json();
+              console.log(' Wishlist API Response Data:', data);
 
-      if (response.ok) {
-        console.log(' Item added to wishlist successfully.');
-        dispatch(addToWishlist(data));
-        console.log(' Wishlist item dispatched to Redux:', data);
-        alert('Added to wishlist');
-        navigation.navigate('Wishlist');
-      } else {
-        console.warn(' Wishlist API error:', data.message);
-        alert(data.message || 'Failed to add to wishlist');
-      }
-    } catch (err) {screen
-      console.error(' Network/API Error while adding to wishlist:', err);
-      alert('Something went wrong while adding to wishlist');
-    }
-  }}>
-  <Icon name="heart-o" size={18} color="black" />
-  <Text style={styles.wishlistText}>WISHLIST</Text>
-</TouchableOpacity>
+              if (response.ok) {
+                console.log(' Item added to wishlist successfully.');
+                dispatch(addToWishlist(data));
+                console.log(' Wishlist item dispatched to Redux:', data);
+                alert('Added to wishlist');
+                navigation.navigate('Wishlist');
+              } else {
+                console.warn(' Wishlist API error:', data.message);
+                alert(data.message || 'Failed to add to wishlist');
+              }
+            } catch (err) {
+              screen;
+              console.error(
+                ' Network/API Error while adding to wishlist:',
+                err,
+              );
+              alert('Something went wrong while adding to wishlist');
+            }
+          }}>
+          <Icon name="heart-o" size={18} color="black" />
+          <Text style={styles.wishlistText}>WISHLIST</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={async () => {
+            console.log('🛒 Add to cart button pressed');
 
+            if (!token) {
+              console.warn(' No token found. Redirecting to login.');
+              navigation.navigate('Login', {
+                fromScreen: 'ProductDetail',
+                itemId: product.itemId._id,
+              });
+              return;
+            }
 
+            const selectedColorObj = imagesByColor.find(colorObj =>
+              colorObj.images.some(
+                img => img.url === selectedColorImages[0]?.url,
+              ),
+            );
 
+            const selectedColor = selectedColorObj?.color || 'Black';
 
-<TouchableOpacity
-  style={styles.cartButton}
-  onPress={async () => {
-    console.log('🛒 Add to cart button pressed');
+            console.log(' Selected Color:', selectedColor);
 
-    if (!token) {
-      console.warn(' No token found. Redirecting to login.');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
+            // Get selected size (you can make user select size dynamically later)
+            const selectedSizeObj = selectedColorObj?.sizes?.[0]; // take first available size for now
+            const selectedSize = selectedSizeObj?.size || '';
+            const skuId = selectedSizeObj?.skuId || '';
 
-    const selectedColorObj = imagesByColor.find(colorObj =>
-      colorObj.images.some(img => img.url === selectedColorImages[0]?.url)
-    );
+            console.log(' Selected Size:', selectedSize);
+            console.log(' Selected SKU ID:', skuId);
 
-    const selectedColor = selectedColorObj?.color || 'Black';
+            if (!selectedSize || !skuId) {
+              alert('Please select a valid size.');
+              return;
+            }
 
-    console.log(' Selected Color:', selectedColor);
+            const payload = {
+              itemId: product.itemId._id,
+              quantity: 1, // default 1
+              size: selectedSize,
+              color: selectedColor,
+              skuId: skuId,
+            };
 
-    // Get selected size (you can make user select size dynamically later)
-    const selectedSizeObj = selectedColorObj?.sizes?.[0]; // take first available size for now
-    const selectedSize = selectedSizeObj?.size || '';
-    const skuId = selectedSizeObj?.skuId || '';
+            console.log(' Cart Payload:', payload);
 
-    console.log(' Selected Size:', selectedSize);
-    console.log(' Selected SKU ID:', skuId);
+            try {
+              const response = await fetch(
+                'http://10.0.2.2:4000/api/usercart/create',
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(payload),
+                },
+              );
 
-    if (!selectedSize || !skuId) {
-      alert('Please select a valid size.');
-      return;
-    }
+              const data = await response.json();
 
-    const payload = {
-      itemId: product.itemId._id,
-      quantity: 1, // default 1
-      size: selectedSize,
-      color: selectedColor,
-      skuId: skuId,
-    };
+              console.log(' Cart API Response:', data);
 
-    console.log(' Cart Payload:', payload);
-
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/usercart/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      console.log(' Cart API Response:', data);
-
-      if (response.ok) {
-        alert('Added to cart successfully.');
-        navigation.navigate('Cart'); // ✅ navigate to cart
-      } else {
-        alert(data.message || 'Failed to add to cart.');
-      }
-    } catch (error) {
-      console.error(' Cart API Error:', error);
-      alert('Something went wrong while adding to cart.');
-    }
-  }}
->
-  <Feather name="shopping-cart" size={18} color="#fff" />
-  <Text style={styles.cartText}>ADD TO CART</Text>
-</TouchableOpacity>
-
-
-
-
-
+              if (response.ok) {
+                alert('Added to cart successfully.');
+                navigation.navigate('Cart'); // ✅ navigate to cart
+              } else {
+                alert(data.message || 'Failed to add to cart.');
+              }
+            } catch (error) {
+              console.error(' Cart API Error:', error);
+              alert('Something went wrong while adding to cart.');
+            }
+          }}>
+          <Feather name="shopping-cart" size={18} color="#fff" />
+          <Text style={styles.cartText}>ADD TO CART</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
