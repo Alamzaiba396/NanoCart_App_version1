@@ -1,34 +1,33 @@
 import React from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import CarouselSlider from '../../Component/CarouselSlider';
-import Header from '../../Component/Header';
-import PromoBanner from '../../Component/PromoBanner';
-import CardSlider from '../../Component/CardSlider';
-import TrendingDeals from '../../Component/TrendingDeals';
+import PartnerHeader from '../Components/PartnerHeader';
+import PartnerCarouselSlider from '../Components/PartnerCarouselSlider';
+import PartnerPromoBanner from '../Components/PartnerPromoBanner';
+import PartnerCardSlider from '../Components/PartnerCardSlider';
+import PartnerTrendingDeals from '../Components/PartnerTrendingDeals';
 
 const PartnerHomeScreen = () => {
   const images = [
     require('../../assets/Images/card1.png'),
-    require('../../assets/Images/card2.png'),
-    require('../../assets/Images/card3.png'),
-    require('../../assets/Images/card4.png'),
-    require('../../assets/Images/card5.png'),
-    require('../../assets/Images/card6.png'),
+    require('../../assets/Images/card1.png'),
+    require('../../assets/Images/card1.png'),
+    require('../../assets/Images/card1.png'),
+    require('../../assets/Images/card1.png'),
   ];
 
-  console.log('HomeScreen images:', images);
+  console.log( 'partner HomeScreen images of [partner flow]:', images);
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}>
-      <Header />
-      <CarouselSlider />
-      <PromoBanner />
+    <PartnerHeader/>
+      <PartnerCarouselSlider />
+      <PartnerPromoBanner />
       <View style={styles.sliderWrapper}>
-        <CardSlider images={images} />
+        <PartnerCardSlider images={images} />
       </View>
-      <TrendingDeals />
+      <PartnerTrendingDeals />
     </ScrollView>
   );
 };

@@ -1,40 +1,61 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import SplashScreen from "./Src/Screen/SplashScreen";
-import LoginScreen from "./Src/Screen/LoginScreen";
-import VerificationScreen from "./Src/Screen/VerificationScreen";
-import RegisterScreen from "./Src/Screen/RegisterScreen";
-import BottomTabBar from "./Src/Component/BottomTabBar";
-import PromoBanner from "./Src/Component/PromoBanner";
-import CardSlider from "./Src/Component/CardSlider";
-import SearchCategory from "./Src/Screen/SearchCategory";
-import SubCategoryScreen from "./Src/Screen/SubCategoryScreen";
-import ProductDetailScreen from "./Src/Screen/ProductDetailScreen";
-import ProductDetailPhotoScreen from "./Src/Screen/ProductDetailPhotoScreen";
-import SizeChartScreen from "./Src/Screen/SizeChartScreen";
-import CartScreen from "./Src/Screen/CartScreen";
-import DeliveryAddressScreen from "./Src/Screen/DeliveryAddressScreen";
-import AddNewAddressScreen from "./Src/Screen/AddNewAddressScreen";
-import EditScreen from "./Src/Screen/EditScreen";
-import PaymentScreen from "./Src/Screen/PaymentScreen";
-import MyAccountScreen from "./Src/Screen/MyAccountScreen";
+import SplashScreen from "./Src/UserFlow/Screen/SplashScreen";
+import LoginScreen from "./Src/UserFlow/Screen/LoginScreen";
+
+import RegisterScreen from "./Src/UserFlow/Screen/UserRegisterScreen";
+import BottomTabBar from "./Src/UserFlow/Component/BottomTabBar";
+import PromoBanner from "./Src/UserFlow/Component/PromoBanner";
+import CardSlider from "./Src/UserFlow/Component/CardSlider";
+import SearchCategory from "./Src/UserFlow/Screen/SearchCategory";
+import SubCategoryScreen from "./Src/UserFlow/Screen/SubCategoryScreen";
+import ProductDetailScreen from "./Src/UserFlow/Screen/ProductDetailScreen";
+import ProductDetailPhotoScreen from "./Src/UserFlow/Screen/ProductDetailPhotoScreen";
+import SizeChartScreen from "./Src/UserFlow/Screen/SizeChartScreen";
+import CartScreen from "./Src/UserFlow/Screen/CartScreen";
+import DeliveryAddressScreen from "./Src/UserFlow/Screen/DeliveryAddressScreen";
+import AddNewAddressScreen from "./Src/UserFlow/Screen/AddNewAddressScreen";
+import EditScreen from "./Src/UserFlow/Screen/EditScreen";
+import PaymentScreen from "./Src/UserFlow/Screen/PaymentScreen";
+import MyAccountScreen from "./Src/UserFlow/Screen/MyAccountScreen";
 import { Provider } from "react-redux";
 import { store } from "./Src/redux/store";
-import LoginVerifyOtpScreen from "./Src/Screen/LoginVerifyOtpScreen";
-import ProfileScreen from "./Src/Screen/ProfileScreen";
+import LoginVerifyOtpScreen from "./Src/UserFlow/Screen/LoginVerifyOtpScreen";
+import ProfileScreen from "./Src/UserFlow/Screen/ProfileScreen";
 import PartnerCatalogueScreen from "./Src/Partner/Screens/PartnerCatalogueScreen";
-import WishlistScreen from "./Src/Screen/WishlistScreen";
-import SavedAddressScreen from "./Src/Screen/SavedAddressScreen";
+import WishlistScreen from "./Src/UserFlow/Screen/WishlistScreen";
+import SavedAddressScreen from "./Src/UserFlow/Screen/SavedAddressScreen";
 import PartnerRegisterScreen from "./Src/Partner/Screens/PartnerRegisterScreen";
 import PartnerAccountScreen from "./Src/Partner/Screens/PartnerAccountScreen";
-import PartnerVerificationScreen from "./Src/Partner/Screens/PartnerVerificationScreen";
-import PartnerSearchCategory from "./Src/Partner/Screens/PartnerSearchCategory";
-import PartnerSubCategoryScreen from "./Src/Partner/Screens/PartnerSubcategoryScreen";
+
+
+// 
 import PartnerOrderConfirmationScreen from "./Src/Partner/Screens/PartnerOrderConfirmScreen";
 import PartnerOrderHistoryScreen from "./Src/Partner/Screens/PartnerOrderHistoryScreen";
-import PartnerHomeScreen from "./Src/Partner/Screens/PartnerHomeScreen";
+
 import PartnerWalletScreen from "./Src/Partner/Screens/PartnerWalletScreen";
+
+import RegisterVerificationScreen from "./Src/UserFlow/Screen/RegisterVerificationScreen";
+import RateProductScreen from "./Src/UserFlow/Screen/RateProductScreen";
+
+import OrderHistoryScreen from "./Src/UserFlow/Screen/OrderHistoryScreen";
+import TrackOrderScreen from "./Src/UserFlow/Screen/TrackOrderScreen";
+import OrderConfirmationScreen from "./Src/UserFlow/Screen/OrderConfirmationScreen";
+import CancelOrderScreen from "./Src/UserFlow/Screen/CancelOrderScreen";
+import ReturnExchangeScreen from "./Src/UserFlow/Screen/ReturnExchnageScreen";
+import ReturnConfirmationScreen from "./Src/UserFlow/Screen/ReturnConfirmationScreen";
+import TBYBScreen from "./Src/UserFlow/Screen/TBYBScreen";
+import PartnerBottomTabBar from "./Src/Partner/Components/PartnerBottomTabBar";
+import PartnerSearchCategory from "./Src/Partner/Screens/PartnerSearchCategoryScreen";
+import PartnerSubCategoryScreen from "./Src/Partner/Screens/PartnerSubCategoryScreen";
+import PartnerProductDetail from "./Src/Partner/Screens/PartnerProductDetail";
+import PartnerSizeChartScreen from "./Src/Partner/Screens/PartnerSizeChartScreen";
+import PartnerAddNewAddressScreen from "./Src/Partner/Screens/PartnerAddNewAddressScreen";
+import PartnerDeliveryAddressScreen from "./Src/Partner/Screens/PartnerDeliveryAddressScreen";
+import PartnerEditScreen from "./Src/Partner/Screens/PartnerEditScreen";
+import PartnerSavedAddressScreen from "./Src/Partner/Screens/PartnerSavedAddressScreen";
+import PartnerProfileScreen from "./Src/Partner/Screens/PartnerProfileScreen";
 
 
 const Stack = createStackNavigator();
@@ -44,6 +65,12 @@ const App = () => {
         <Provider store={store}> 
         <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="UserRegister" component={RegisterScreen} />
+        <Stack.Screen name="LoginVerifyOtp" component={LoginVerifyOtpScreen} />
+        <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen}  />
+        <Stack.Screen name="RegisterVerifyOtp" component={RegisterVerificationScreen} />
+      
         <Stack.Screen name="Home" component={BottomTabBar} />
         <Stack.Screen name="Promo" component={PromoBanner} />
         <Stack.Screen name="Card" component={CardSlider} />
@@ -54,153 +81,58 @@ const App = () => {
         <Stack.Screen name="SizeChart" component={SizeChartScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="Delivery" component={DeliveryAddressScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="VerifyOtp" component={VerificationScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="AddNewAddress" component={AddNewAddressScreen} />
         <Stack.Screen name="edit" component={EditScreen} />
         <Stack.Screen name="Payment" component={PaymentScreen} />
         <Stack.Screen name="Account" component={MyAccountScreen} />
-        <Stack.Screen name="LoginVerifyOtp" component={LoginVerifyOtpScreen} />
+        <Stack.Screen name="TrackOrder" component={TrackOrderScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
-  
-        <Stack.Screen
-            name="PartnerAccount"
-            component={PartnerAccountScreen}
-          />
-          <Stack.Screen
-            name="PartnerRegister"
-            component={PartnerRegisterScreen}
-          />
-          <Stack.Screen
-            name="PatnerVerification"
-            component={PartnerVerificationScreen}
-          />
-          <Stack.Screen
-            name="PartnerCatalogue"
-            component={PartnerCatalogueScreen}
-          />
-          <Stack.Screen name="PartnerHome" component={PartnerHomeScreen} />
-          <Stack.Screen
-            name="PartnerSearchCategory"
-            component={PartnerSearchCategory}
-          />
-          <Stack.Screen
-            name="PartnerSubCategory"
-            component={PartnerSubCategoryScreen}
-          />
-          <Stack.Screen name="PartnerWallet" component={PartnerWalletScreen} />
-          <Stack.Screen
-            name="PartnerOrderConfirmation"
-            component={PartnerOrderConfirmationScreen}
-          />
-          <Stack.Screen
-            name="PartnerOrderHistory"
-            component={PartnerOrderHistoryScreen}
-          />
+        <Stack.Screen name="RateProduct" component={RateProductScreen} />
         <Stack.Screen name="Saved" component={SavedAddressScreen} />
+        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+        <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
+        <Stack.Screen name="CancelOrder" component={CancelOrderScreen} />
+        <Stack.Screen name="ReturnExchange" component={ReturnExchangeScreen} />
+        <Stack.Screen name="ReturnConfirm" component={ReturnConfirmationScreen} />
+        <Stack.Screen name="TBYB" component={TBYBScreen} />
+
+
+
+        <Stack.Screen name="PartnerHome" component={PartnerBottomTabBar} />
+        <Stack.Screen name="PartnerSearch"component={PartnerSearchCategory} />
+        <Stack.Screen name="PartnerProductDetail" component={PartnerProductDetail} />
+          <Stack.Screen name="PartnerAccount" component={PartnerAccountScreen} />
+          <Stack.Screen name="PartnerCatalogue"component={PartnerCatalogueScreen} />
+          <Stack.Screen name="PartnerSubCategory"component={PartnerSubCategoryScreen} />
+          <Stack.Screen name="PartnerSizeChat"component={PartnerSizeChartScreen} />
+          <Stack.Screen name="PartnerWallet" component={PartnerWalletScreen} />
+          <Stack.Screen  name="PartnerOrderConfirmation"  component={PartnerOrderConfirmationScreen}  /> 
+          <Stack.Screen  name="PartnerOrderHistory"  component={PartnerOrderHistoryScreen}/>
+          <Stack.Screen  name="PartnerAddNewAddress"  component={PartnerAddNewAddressScreen}/>
+          <Stack.Screen  name="PartnerEdit"  component={PartnerEditScreen}/>
+          <Stack.Screen  name="PartnerProfile"  component={PartnerProfileScreen}/>
+          <Stack.Screen  name="PartnerDeliveryAddress"  component={PartnerDeliveryAddressScreen}/>
+          <Stack.Screen  name="PartnerSavedAddress"  component={PartnerSavedAddressScreen}/>
       </Stack.Navigator>
       </Provider>
     </NavigationContainer>
-  );
+  ); 
 };
-
 export default App;
 
 
 
 
-
-
-// import React from "react";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
-// import { useSelector } from "react-redux";
-// import { Provider } from "react-redux";
-// import { store } from "./Src/redux/store";
-// import jwtDecode from "jwt-decode";
-
-// // Screens
-// import SplashScreen from "./Src/Screen/SplashScreen";
-// import LoginScreen from "./Src/Screen/LoginScreen";
-// import VerificationScreen from "./Src/Screen/VerificationScreen";
-// import RegisterScreen from "./Src/Screen/RegisterScreen";
-// import BottomTabBar from "./Src/Component/BottomTabBar";
-// import PartnerVerificationScreen from "./Src/Screen/PartnerVerificationScreen";
-// import PartnerCatalogueScreen from "./Src/Screen/PartnerCatalogueScreen";
-// import PartnerRegisterScreen from "./Src/Partner/Screens/PartnerRegisterScreen";
-// // Import all other screens you already have...
-
-// const Stack = createStackNavigator();
-
-// const UserFlow = () => (
-//   <Stack.Navigator screenOptions={{ headerShown: false }}>
-//     <Stack.Screen name="Home" component={BottomTabBar} />
-//     <Stack.Screen name="Search" component={SearchCategory} />
-//     <Stack.Screen name="SubCategory" component={SubCategoryScreen} />
-//     <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-//     <Stack.Screen name="Cart" component={CartScreen} />
-//     <Stack.Screen name="Account" component={MyAccountScreen} />
-//     {/* ➔ Add more user screens here */}
-//   </Stack.Navigator>
-// );
-
-// const PartnerFlow = () => (
-//   <Stack.Navigator screenOptions={{ headerShown: false }}>
-//     <Stack.Screen name="PartnerVerification" component={PartnerVerificationScreen} />
-//     <Stack.Screen name="PartnerCatalogue" component={PartnerCatalogueScreen} />
-//     {/* ➔ Add more partner screens here */}
-//   </Stack.Navigator>
-// );
-
-// const AuthFlow = () => (
-//   <Stack.Navigator screenOptions={{ headerShown: false }}>
-//     <Stack.Screen name="Splash" component={SplashScreen} />
-//     <Stack.Screen name="Login" component={LoginScreen} />
-//     <Stack.Screen name="VerifyOtp" component={VerificationScreen} />
-//     <Stack.Screen name="Register" component={RegisterScreen} />
-//     <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
-//     {/* ➔ Add more auth screens here */}
-//   </Stack.Navigator>
-// );
-
-// const RootNavigator = () => {
-//   const token = useSelector((state) => state.auth.token);
-
-//   console.log('🛡️ Token found:', token);
-
-//   if (!token) {
-//     console.log('🔓 No token found ➔ showing Auth Flow');
-//     return <AuthFlow />;
-//   }
-
-//   try {
-//     const decoded = jwtDecode(token);
-//     console.log('🔍 Decoded Token:', decoded);
-
-//     if (decoded?.role === "Partner") {
-//       console.log('👨‍💼 Partner role ➔ showing Partner Flow');
-//       return <PartnerFlow />;
-//     } else if (decoded?.role === "User") {
-//       console.log('🛒 User role ➔ showing User Flow');
-//       return <UserFlow />;
-//     } else {
-//       console.warn('⚠️ Unknown role, fallback to Auth Flow');
-//       return <AuthFlow />;
-//     }
-//   } catch (error) {
-//     console.error('❌ Error decoding token:', error);
-//     return <AuthFlow />;
-//   }
-// };
+// import React from 'react';
+// import { Provider } from 'react-redux';
+// import { store } from './Src/redux/store';
+// import AuthNavigation from './Src/AuthNavigation';
 
 // const App = () => {
 //   return (
 //     <Provider store={store}>
-//       <NavigationContainer>
-//         <RootNavigator />
-//       </NavigationContainer>
+//       <AuthNavigation />
 //     </Provider>
 //   );
 // };

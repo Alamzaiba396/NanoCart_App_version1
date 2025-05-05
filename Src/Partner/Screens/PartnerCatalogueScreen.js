@@ -10,8 +10,8 @@ import {
   Dimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import Header from '../../Component/Header';
-import AccordionItem from '../../Component/AccordionItem';
+import Header from '../../UserFlow/Component/Header';
+import AccordionItem from '../../UserFlow/Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/AntDesign';
 

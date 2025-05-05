@@ -9,10 +9,11 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import Header from '../../Component/Header';
-import SubCategoryItem from '../../Component/SubCategoryItem';
-import FilterComponent from '../../Component/FilterComponent';
-import SortComponent from '../../Component/SortComponent';
+import Header from '../../UserFlow/Component/Header';
+
+import FilterComponent from '../../UserFlow/Component/FilterComponent';
+import SortComponent from '../../UserFlow/Component/SortComponent';
+import PartnerSubCategoryItem from '../Components/PartnerSubCategoryItem';
 
 const PartnerSubCategoryScreen = ({navigation, route}) => {
   const {subCategory} = route.params;
@@ -91,7 +92,7 @@ const PartnerSubCategoryScreen = ({navigation, route}) => {
           numColumns={2}
           showsVerticalScrollIndicator={false}
           renderItem={({item}) => (
-            <SubCategoryItem
+            <PartnerSubCategoryItem
               item={item}
               itemId={item.itemId}
               navigation={navigation}
