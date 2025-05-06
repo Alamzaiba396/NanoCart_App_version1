@@ -14,7 +14,7 @@ const SplashScreen = ({ navigation }) => {
 
    
     setTimeout(() => {
-      navigation.replace("Home"); 
+      navigation.replace("BottomTab"); 
     }, 3000);
   }, []);
 

@@ -6,15 +6,13 @@ import {
   TouchableOpacity,
   Text,
   Image,
-  Modal,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import PartnerWishlistCardItem from '../Components/PartnerWishlistCardItem';
 
-const  PartnerWishlistScreen = () => {
+const PartnerWishlistScreen = () => {
   const navigation = useNavigation();
   const token = useSelector(state => state.auth.token);
   const cartItems = useSelector(state => state.cart.items);
@@ -23,16 +21,14 @@ const  PartnerWishlistScreen = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
 
-
   const fetchWishlist = async () => {
     if (!token) {
-      setShowLoginModal(true); //  Show login modal if token is missing
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:4000/api/userwishlist', {
+      const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -44,10 +40,10 @@ const  PartnerWishlistScreen = () => {
       if (response.ok) {
         setWishlist(data?.data?.items || []);
       } else {
-        console.warn("Failed to load wishlist:", data.message);
+        console.warn('Failed to load partner wishlist:', data.message);
       }
     } catch (err) {
-      console.error("Error fetching wishlist:", err);
+      console.error('Error fetching partner wishlist:', err);
     } finally {
       setLoading(false);
     }
@@ -59,13 +55,12 @@ const  PartnerWishlistScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => navigation.navigate('PartnerHome')}>
             <Image source={require('../../assets/Images/Back.png')} style={styles.backIcon} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}> PARTNER WISHLIST</Text>
+          <Text style={styles.headerTitle}>PARTNER WISHLIST</Text>
         </View>
 
         <View style={styles.rightIcons}>
@@ -73,16 +68,7 @@ const  PartnerWishlistScreen = () => {
             <Image source={require('../../assets/Images/SearchIcon.png')} style={styles.icon} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cartIconWrapper}
-            onPress={() => {
-              if (token) {
-                navigation.navigate('Cart');
-              } else {
-                setShowLoginModal(true);
-              }
-            }}
-          >
+          <TouchableOpacity style={styles.cartIconWrapper} onPress={() => navigation.navigate('Cart')}>
             <Image source={require('../../assets/Images/Cart.png')} style={styles.icon} />
             {cartCount > 0 && (
               <View style={styles.cartBadge}>
@@ -93,7 +79,6 @@ const  PartnerWishlistScreen = () => {
         </View>
       </View>
 
-      {/* Wishlist Grid */}
       {loading ? (
         <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
@@ -112,33 +97,6 @@ const  PartnerWishlistScreen = () => {
           contentContainerStyle={styles.grid}
         />
       )}
-
-      {/* Filter and Sort Modals */}
-      {/* <Modal animationType="slide" transparent visible={isFilterModalVisible} onRequestClose={() => setFilterModalVisible(false)}>
-        <FilterComponent onClose={() => setFilterModalVisible(false)} />
-      </Modal>
-      <Modal animationType="slide" transparent visible={isSortModalVisible} onRequestClose={() => setSortModalVisible(false)}>
-        <SortComponent onClose={() => setSortModalVisible(false)} />
-      </Modal> */}
-
-      {/*  Not Logged In Modal */}
-      {/* <Modal visible={showLoginModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Uh-oh!</Text>
-            <Text style={styles.modalMessage}>You're not logged in.</Text>
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={() => {
-                setShowLoginModal(false);
-                navigation.navigate('Login', { fromScreen: 'Wishlist' });
-              }}
-            >
-              <Text style={styles.loginButtonText}>Go to Login</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal> */}
     </View>
   );
 };
@@ -175,41 +133,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cartBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
-
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: '#00000099',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBox: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 25,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 10,
-    color: '#D86427',
-  },
-  modalMessage: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  loginButton: {
-    backgroundColor: '#D86427',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  grid: {
+    paddingHorizontal: 8,
+    paddingBottom: 16,
   },
 });

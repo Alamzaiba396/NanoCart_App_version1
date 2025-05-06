@@ -22,7 +22,7 @@ const PartnerSizeChartScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={20} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>SIZE CHART</Text>
+        <Text style={styles.headerTitle}>  Partner SIZE CHART</Text>
       </View>
 
       {/* Unit Toggle */}

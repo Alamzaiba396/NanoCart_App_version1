@@ -88,7 +88,7 @@ const PartnerMyAccountScreen = () => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image source={require('../../assets/Images/Back.png')} style={styles.backIcon} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>MY ACCOUNT</Text>
+            <Text style={styles.headerTitle}> Partner MY ACCOUNT</Text>
           </View>
           <View style={styles.rightIcons}>
             <TouchableOpacity>

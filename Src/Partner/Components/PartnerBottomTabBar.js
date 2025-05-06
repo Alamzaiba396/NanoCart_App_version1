@@ -51,7 +51,7 @@ const PartnerBottomTabBar = () => {
           );
         },
       })}>
-      <Tab.Screen name="PartnerHome" component={PartnerHomeScreen} />
+      <Tab.Screen name="Home" component={PartnerHomeScreen} />
       <Tab.Screen name="wishlist" component={PartnerWishlistScreen} />
       <Tab.Screen name="Account" component={PartnerMyAccountScreen} />
     </Tab.Navigator>

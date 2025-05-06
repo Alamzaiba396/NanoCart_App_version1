@@ -2,6 +2,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import {
+  Alert,
   View,
   Text,
   ScrollView,
@@ -66,6 +67,65 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
 
   const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure,PPQ,deliveryPincode } = product;
 
+  const handleAddToWishlist = async () => {
+    console.log('Wishlist button pressed');
+
+    if (!token) {
+      console.log('No token found. Redirecting to login screen...');
+      navigation.navigate('Login', {
+        fromScreen: 'PartnerProductDetail',
+        itemId: product.itemId._id,
+      });
+      return;
+    }
+
+    console.log('Token found:', token);
+
+    const colorObj = imagesByColor.find((colorSet) =>
+      colorSet.images.some((img) => img.url === selectedColorImages[0]?.url)
+    );
+    const selectedColor = colorObj?.color || 'Default Color';
+
+    console.log('Selected color:', selectedColor);
+    console.log('Item ID:', product.itemId._id);
+
+    const payload = {
+      itemId: product.itemId._id,
+      color: selectedColor,
+    };
+
+    console.log('Request Payload:', payload);
+
+    try {
+      const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist/create', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Wishlist API Response Status:', response.status);
+
+      const data = await response.json();
+      console.log('Wishlist API Response Data:', data);
+
+      if (response.ok) {
+        console.log('Item added to wishlist successfully.');
+        dispatch(addToWishlist(data));
+        console.log('Wishlist item dispatched to Redux:', data);
+        Alert.alert('Success', 'Partner Added to wishlist');
+        navigation.navigate('PartnerWishlist');
+      } else {
+        console.warn('Wishlist API error:', data.message);
+        Alert.alert('Error', data.message || 'Failed to add to wishlist');
+      }
+    } catch (err) {
+      console.error('Network/API Error while adding to wishlist:', err);
+      Alert.alert('Error', 'Something went wrong while adding to wishlist');
+    }
+  };
   return (
     <View style={styles.container}>
       <PartnerHeader />
@@ -304,68 +364,11 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
  
 <TouchableOpacity
   style={styles.wishlistButton}
-  onPress={async () => {
-    console.log(' Wishlist button pressed');
-
-    if (!token) {
-      console.log(' No token found. Redirecting to login screen...');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
-
-    console.log(' Token found:', token);
-
-    const colorObj = imagesByColor.find(colorSet =>
-      colorSet.images.some(img => img.url === selectedColorImages[0]?.url)
-    );
-    const selectedColor = colorObj?.color || 'Black';
-
-    console.log(' Selected color:', selectedColor);
-    console.log(' Item ID:', product.itemId._id);
-
-    const payload = {
-      itemId: product.itemId._id,
-      color: selectedColor,
-    };
-
-    console.log(' Request Payload:', payload);
-
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      console.log(' Wishlist API Response Status:', response.status);
-
-      const data = await response.json();
-      console.log(' Wishlist API Response Data:', data);
-
-      if (response.ok) {
-        console.log(' Item added to wishlist successfully.');
-        dispatch(addToWishlist(data));
-        console.log(' Wishlist item dispatched to Redux:', data);
-        alert('Added to wishlist');
-        navigation.navigate('PartnerWishlist');
-      } else {
-        console.warn(' Wishlist API error:', data.message);
-        alert(data.message || 'Failed to add to wishlist');
-      }
-    } catch (err) {screen
-      console.error(' Network/API Error while adding to wishlist:', err);
-      alert('Something went wrong while adding to wishlist');
-    }
-  }}>
+  onPress={ handleAddToWishlist}>
+  
   <Icon name="heart-o" size={18} color="black" />
   <Text style={styles.wishlistText}>WISHLIST</Text>
-</TouchableOpacity>
+  </TouchableOpacity>
 
 <TouchableOpacity
   style={styles.cartButton}
