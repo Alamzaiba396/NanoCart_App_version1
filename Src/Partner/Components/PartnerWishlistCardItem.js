@@ -16,61 +16,46 @@ const PartnerWishlistCardItem = ({ item, navigation, onRemove }) => {
   const token = useSelector(state => state.auth.token);
 
   const product = item?.itemId;
+
   const color = item?.color;
   const itemId = product?._id;
 
-
   const handleHeartPress = async () => {
-    console.log(" Heart press triggered");
+    console.log("Heart press triggered");
   
-    const itemId = item?.itemId?._id;
-    const color = item?.color;
-  
-    console.log(" Extracted itemId:", itemId);
-    console.log(" Extracted color:", color);
+    console.log("Extracted itemId:", itemId);
+    console.log("Extracted color:", color);
+    console.log("Token:", token);
   
     if (!token || !itemId || !color) {
-      console.warn(" Missing token, itemId, or color");
+      console.warn("❌ Missing token, itemId, or color");
       return;
     }
   
     try {
-      console.log("🗑 Sending remove request to wishlist:", {
-        itemId,
-        color,
-      });
-  
       const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist/removeitem', {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json', // 
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          itemId,
-          color,
-        }),
+        body: JSON.stringify({ itemId, color }),
       });
   
-      console.log(" Awaiting response...");
       const data = await response.json();
-      console.log(" Response received:", data);
+      console.log("✅ Wishlist Remove Response:", data);
   
       if (response.ok) {
-        console.log(" Item successfully removed from wishlist");
         Alert.alert('Removed', 'Item removed from wishlist.');
-        onRemove(); // refreshes wishlist
-  
+        onRemove(); // Refresh
       } else {
-        console.warn(" Failed to remove from wishlist:", data.message);
         Alert.alert('Error', data.message || 'Failed to remove from wishlist');
       }
     } catch (error) {
-      console.error(" Error during wishlist remove:", error);
+      console.error("❌ API Error:", error);
       Alert.alert('Error', 'Something went wrong.');
     }
   };
-  
 
 
   return (

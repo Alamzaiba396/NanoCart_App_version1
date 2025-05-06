@@ -80,6 +80,7 @@ const MainNavigator = () => {
       <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
 
       {/* User Flow (protect Cart/Profile/Wishlist inside) */}
+      <Stack.Screen name="UserHome" component={BottomTabBar} />
       <Stack.Screen name="Promo" component={PromoBanner} />
       <Stack.Screen name="Card" component={CardSlider} />
       <Stack.Screen name="Search" component={SearchCategory} />
