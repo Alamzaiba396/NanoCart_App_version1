@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
-const WishlistCardItem = ({ item, navigation, onRemove }) => {
+const PartnerWishlistCardItem = ({ item, navigation, onRemove }) => {
   const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
 
@@ -40,7 +40,7 @@ const WishlistCardItem = ({ item, navigation, onRemove }) => {
         color,
       });
   
-      const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist/remove', {
+      const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist/removeitem', {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -158,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WishlistCardItem;
+export default PartnerWishlistCardItem;

@@ -25,7 +25,7 @@ const PartnerSubCategoryItem = ({ item, navigation }) => {
     const color = item?.defaultColor || 'Black';
 
     if (!itemId) {
-      console.warn('❌ item.itemId is missing');
+      console.warn(' item.itemId is missing');
       return;
     }
 
@@ -40,7 +40,7 @@ const PartnerSubCategoryItem = ({ item, navigation }) => {
     }
 
     try {
-      const res = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
+      const res = await fetch('http://10.0.2.2:4000/api/partner/wishlist/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,13 +51,13 @@ const PartnerSubCategoryItem = ({ item, navigation }) => {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        Alert.alert('Success', 'Item added to wishlist!');
-        navigation.navigate('Wishlist');
+        Alert.alert('Success partner ', 'Item added to wishlist!');
+        navigation.navigate('PartnerWishlist');
       } else {
         Alert.alert('Error', data.message || 'Failed to add to wishlist');
       }
     } catch (error) {
-      console.error('❌ Wishlist API error:', error);
+      console.error(' Wishlist API error:', error);
       Alert.alert('Error', 'Something went wrong while adding to wishlist');
     }
   };

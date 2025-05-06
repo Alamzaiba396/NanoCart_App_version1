@@ -30,7 +30,7 @@ const WishlistScreen = () => {
 
   const fetchWishlist = async () => {
     if (!token) {
-      setShowLoginModal(true); // 🔴 Show login modal if token is missing
+      setShowLoginModal(true); //  Show login modal if token is missing
       return;
     }
 
