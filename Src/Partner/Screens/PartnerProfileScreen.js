@@ -1,12 +1,11 @@
-
 import {
   StyleSheet,
-  Image,
   Text,
   View,
   TextInput,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -14,17 +13,24 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 const PartnerProfileScreen = () => {
-  const navigation=useNavigation();
+  const navigation = useNavigation();
   const token = useSelector(state => state.auth.token);
 
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
+  const [shopName, setShopName] = useState('');
+  const [gstNo, setGstNo] = useState('');
+  const [panNo, setPanNo] = useState('');
+  const [shopAddress, setShopAddress] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [town, setTown] = useState('');
+  const [state, setState] = useState('');
+  const [mapLink, setMapLink] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        console.log('📦 Fetching profile...');
         const response = await fetch('http://10.0.2.2:4000/api/auth/profile', {
           method: 'GET',
           headers: {
@@ -32,63 +38,32 @@ const PartnerProfileScreen = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
         const data = await response.json();
-        console.log('👤 Profile Data:', data);
-
         if (response.ok && data?.data) {
-          setName(data.data.name || '');
-          setEmail(data.data.email || '');
-          setMobile(data.data.phoneNumber || '');
+          const d = data.data;
+          setName(d.name || '');
+          setEmail(d.email || '');
+          setMobile(d.phoneNumber || '');
+          setShopName(d.shopName || '');
+          setGstNo(d.gstNo || '');
+          setPanNo(d.panNo || '');
+          setShopAddress(d.shopAddress || '');
+          setPincode(d.pincode || '');
+          setTown(d.town || '');
+          setState(d.state || '');
+          setMapLink(d.mapLink || '');
         } else {
           Alert.alert('Error', 'Failed to load profile');
         }
       } catch (err) {
-        console.log(' Error fetching profile:', err);
         Alert.alert('Error', 'Something went wrong');
       }
     };
 
     if (token) {
       fetchProfile();
-    } else {
-      Alert.alert('Login Required', 'Please log in to view your profile');
-      navigation.navigate('Login');
     }
   }, [token]);
-
-  const handleSave = async () => {
-    try {
-      const payload = {
-        name,
-        email,
-      };
-
-      console.log(' Updating profile with:', payload);
-
-      const response = await fetch('http://10.0.2.2:4000/api/auth/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      console.log(' PUT Response:', data);
-
-      if (response.ok) {
-        Alert.alert('Success', 'Profile updated successfully');
-        navigation.navigate('Account'); // Navigate to MyAccount after saving
-      } else {
-        Alert.alert('Error', data.message || 'Update failed');
-      }
-    } catch (error) {
-      console.log(' Error updating profile:', error);
-      Alert.alert('Error', 'Something went wrong');
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -100,55 +75,43 @@ const PartnerProfileScreen = () => {
         <Text style={styles.headerTitle}>PROFILE</Text>
       </View>
 
-      {/* Form */}
-      <View style={styles.formContainer}>
-        <Text style={styles.inputTitle}>Name</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-          placeholder="Enter name"
-          placeholderTextColor="#999"
-        />
-
-        <Text style={styles.inputTitle}>Mobile</Text>
-        <TextInput
-          style={[styles.input, { color: '#999' }]}
-          value={mobile}
-          editable={false}
-          placeholder="Mobile number"
-        />
-
-        <Text style={styles.inputTitle}>Email ID</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Enter email"
-          placeholderTextColor="#999"
-          keyboardType="email-address"
-        />
-      </View>
-
-      {/* Save Button */}
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveText}>SAVE CHANGES</Text>
-      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <InputLabel title="Name" value={name} onChange={setName} />
+        <InputLabel title="Mobile" value={`+91-${mobile}`} editable={false} />
+        <InputLabel title="Email ID" value={email} onChange={setEmail} />
+        <InputLabel title="Shop Name" value={shopName} onChange={setShopName} />
+        <InputLabel title="GST No" value={gstNo} onChange={setGstNo} />
+        <InputLabel title="PAN No" value={panNo} onChange={setPanNo} />
+        <InputLabel title="Shop Address" value={shopAddress} onChange={setShopAddress} />
+        <InputLabel title="Pincode" value={pincode} onChange={setPincode} />
+        <InputLabel title="Town/City" value={town} onChange={setTown} />
+        <InputLabel title="State" value={state} onChange={setState} />
+        <InputLabel title="Google Map Address Link" value={mapLink} onChange={setMapLink} />
+      </ScrollView>
     </View>
   );
 };
 
+const InputLabel = ({ title, value, onChange, editable = true }) => (
+  <View style={styles.inputGroup}>
+    <Text style={styles.label}>{title}</Text>
+    <TextInput
+      style={[styles.input, !editable && { color: '#999' }]}
+      value={value}
+      editable={editable}
+      onChangeText={onChange}
+    />
+  </View>
+);
+
 export default PartnerProfileScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: {
-    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 15,
     borderBottomWidth: 0.8,
     borderColor: '#ccc',
   },
@@ -157,34 +120,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
   },
-  formContainer: {
+  scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingVertical: 16,
   },
-  inputTitle: {
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
     fontSize: 14,
-    marginBottom: 4,
-    color: '#777',
+    color: '#333',
+    marginBottom: 6,
   },
   input: {
     fontSize: 15,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 25,
     color: '#000',
-  },
-  saveButton: {
-    backgroundColor: '#D86427',
-    paddingVertical: 14,
-    marginTop: 'auto',
-    marginBottom: 20,
-    marginHorizontal: 16,
-    alignItems: 'center',
-  },
-  saveText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
   },
 });

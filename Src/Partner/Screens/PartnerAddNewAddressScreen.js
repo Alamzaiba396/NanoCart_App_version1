@@ -79,8 +79,8 @@ const PartnerAddNewAddressScreen = () => {
     console.log(isEdit ? ' Editing Address:' : '➕ Creating Address:', payload);
 
     const url = isEdit
-      ? `http://10.0.2.2:4000/api/user/address/${addressId}` //  use addressId
-      : 'http://10.0.2.2:4000/api/user/address/create';
+      ? `http://10.0.2.2:4000/api/partner/address/${addressId}` //  use addressId
+      : 'http://10.0.2.2:4000/api/partner/address/create';
 
     try {
       const response = await fetch(url, {

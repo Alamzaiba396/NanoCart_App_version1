@@ -1,5 +1,3 @@
-
-// WishlistCardItem.js
 import React from 'react';
 import {
   View,
@@ -15,23 +13,20 @@ const PartnerWishlistCardItem = ({ item, navigation, onRemove }) => {
   const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
 
-  const product = item?.itemId;
-
+  const itemId = item?.itemId; // ✅ itemId is a string
   const color = item?.color;
-  const itemId = product?._id;
 
   const handleHeartPress = async () => {
-    console.log("Heart press triggered");
-  
-    console.log("Extracted itemId:", itemId);
-    console.log("Extracted color:", color);
-    console.log("Token:", token);
-  
+    console.log('Heart press triggered');
+    console.log('Extracted itemId:', itemId);
+    console.log('Extracted color:', color);
+    console.log('Token:', token);
+
     if (!token || !itemId || !color) {
-      console.warn("❌ Missing token, itemId, or color");
+      console.warn('❌ Missing token, itemId, or color');
       return;
     }
-  
+
     try {
       const response = await fetch('http://10.0.2.2:4000/api/partner/wishlist/removeitem', {
         method: 'PUT',
@@ -41,26 +36,35 @@ const PartnerWishlistCardItem = ({ item, navigation, onRemove }) => {
         },
         body: JSON.stringify({ itemId, color }),
       });
-  
+
       const data = await response.json();
-      console.log("✅ Wishlist Remove Response:", data);
-  
+      console.log('✅ Partner Wishlist Remove Response:', data);
+
       if (response.ok) {
-        Alert.alert('Removed', 'Item removed from wishlist.');
-        onRemove(); // Refresh
+        Alert.alert('Partner Removed', 'Partner Item removed from wishlist.');
+        onRemove(); // Reload wishlist
       } else {
         Alert.alert('Error', data.message || 'Failed to remove from wishlist');
       }
     } catch (error) {
-      console.error("❌ API Error:", error);
+      console.error(' API Error:', error);
       Alert.alert('Error', 'Something went wrong.');
     }
   };
 
+  // For UI purpose, dummy product display (optional logic)
+  const dummyProduct = {
+    name: 'Item Name',
+    description: 'Some description',
+    image: 'https://via.placeholder.com/200x150',
+    MRP: 999,
+    discountedPrice: 599,
+    discountPercentage: 40,
+  };
 
   return (
     <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: product?.image }} style={styles.image} />
+      <Image source={{ uri: dummyProduct.image }} style={styles.image} />
 
       <TouchableOpacity style={styles.heartIcon} onPress={handleHeartPress}>
         <Image
@@ -70,16 +74,16 @@ const PartnerWishlistCardItem = ({ item, navigation, onRemove }) => {
       </TouchableOpacity>
 
       <Text numberOfLines={1} style={styles.title}>
-        {product?.name?.trim() || 'Unnamed'}
+        {dummyProduct.name}
       </Text>
 
-      <Text style={styles.subtitle}>{product?.description?.trim() || 'No Description'}</Text>
+      <Text style={styles.subtitle}>{dummyProduct.description}</Text>
 
       <View style={styles.priceRow}>
-        <Text style={styles.mrp}>MRP ₹{product?.MRP}</Text>
-        <Text style={styles.price}>₹{product?.discountedPrice}</Text>
+        <Text style={styles.mrp}>MRP ₹{dummyProduct.MRP}</Text>
+        <Text style={styles.price}>₹{dummyProduct.discountedPrice}</Text>
         <Text style={styles.discount}>
-          ({Math.round(product?.discountPercentage)}% Off)
+          ({dummyProduct.discountPercentage}% Off)
         </Text>
       </View>
     </TouchableOpacity>

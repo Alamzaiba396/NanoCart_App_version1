@@ -18,7 +18,7 @@ const PartnerDeliveryAddressScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const response = await fetch('http://10.0.2.2:4000/api/user/address', {
+        const response = await fetch('http://10.0.2.2:4000/api/partner/address', {
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -45,10 +45,10 @@ const PartnerDeliveryAddressScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
     <View style={styles.header}>
-  <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+  <TouchableOpacity onPress={() => navigation.navigate('PartnerHome')}>
     <Icon name="arrow-back" size={22} color="#000" />
   </TouchableOpacity>
-  <Text style={styles.headerTitle}>DELIVERY ADDRESS</Text>
+  <Text style={styles.headerTitle}> PARTNER DELIVERY ADDRESS</Text>
 </View>
       {/* Steps */}
       <View style={styles.stepIndicator}>
@@ -65,7 +65,7 @@ const PartnerDeliveryAddressScreen = ({ navigation }) => {
            
 <TouchableOpacity
   onPress={() => {
-    navigation.navigate('Saved', {
+    navigation.navigate('PartnerSavedAddress', {
       isEdit: true,
       addressId: address?._id,  
       address: address,         
@@ -84,7 +84,7 @@ const PartnerDeliveryAddressScreen = ({ navigation }) => {
 
         {/* Add Address Button (if no address) */}
         {!address && (
-          <TouchableOpacity onPress={() => navigation.navigate('AddNewAddress')} style={styles.addAddressBtn}>
+          <TouchableOpacity onPress={() => navigation.navigate('PartnerAddNewAddress')} style={styles.addAddressBtn}>
             <Text style={styles.addAddressText}>ADD ADDRESS</Text>
           </TouchableOpacity>
         )}
@@ -289,15 +289,19 @@ const styles = StyleSheet.create({
   paymentMode: {
     fontWeight: '600',
   },
+ 
   continueBtn: {
+    backgroundColor: '#f37022',
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     left: 0,
     right: 0,
-    backgroundColor: '#444',
-    paddingVertical: 14,
-    alignItems: 'center',
   },
+  
+  
   continueText: {
     color: '#fff',
     fontWeight: '600',
@@ -352,12 +356,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: '600',
   },
-  continueBtn: {
-    backgroundColor: '#f37022',
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+ 
   continueText: {
     color: '#fff',
     fontSize: 14,

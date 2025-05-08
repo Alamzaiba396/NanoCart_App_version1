@@ -35,6 +35,11 @@ const PartnerRegisterScreen = ({ navigation }) => {
   const [pincode, setPincode] = useState('');
   const [imageShop, setImageShop] = useState(null);
 
+  
+const [pendingModalVisible, setPendingModalVisible] = useState(false);
+const [partnerId, setPartnerId] = useState(null);
+const [pollingInterval, setPollingInterval] = useState(null);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -96,18 +101,18 @@ const PartnerRegisterScreen = ({ navigation }) => {
 
 
   const handleRegister = async () => {
-    console.log('➡️ Starting handleRegister');
+    console.log(' Starting handleRegister');
   
     // Step 1: Validation
     console.log('Checking required fields...');
     if (!name || !email || !shopName || !shopAddress || !pan || !pincode) {
-      console.warn('❌ Validation failed');
+      console.warn(' Validation failed');
       Alert.alert('Validation Error', 'Please fill all required fields');
       return;
     }
   
     // Step 2: FormData
-    console.log('📦 Creating FormData...');
+    console.log(' Creating FormData...');
     const formData = new FormData();
     formData.append('name', name);
     formData.append('email', email);
@@ -128,7 +133,7 @@ const PartnerRegisterScreen = ({ navigation }) => {
   
     // Step 3: API Call
     try {
-      console.log('📤 Sending registration request...');
+      console.log(' Sending registration request...');
       const res = await fetch('http://10.0.2.2:4000/api/auth/partner/signup', {
         method: 'POST',
         headers: {
@@ -138,31 +143,32 @@ const PartnerRegisterScreen = ({ navigation }) => {
       });
   
       const data = await res.json();
-      console.log('✅ API Response:', data);
+      console.log(' API Response:', data);
   
       if (res.ok && data.success) {
         const isVerified = data?.data?.isVerified;
+        const isActive = data?.data?.isActive;
         const message = data.message;
-  
-        if (!isVerified) {
-          console.log('🕒 Partner is not yet verified by admin.');
+        
+        if (!isVerified || !isActive) {
+          console.log(' Partner is not verified or not active. Awaiting admin approval.');
           Alert.alert(
             'Success',
             `${message}\n\nPlease wait for admin approval before logging in.`
           );
-          // ❌ Do NOT navigate
-          return;
+          return; // wait for admin, do NOT navigate
         } else {
-          console.log('✅ Partner is verified, navigating to Home.');
-          Alert.alert('Success', 'Registration complete and verified!');
+          console.log('✅ Partner is verified and active. Navigating to Home.');
+          Alert.alert('Success', 'Registration complete and approved!');
           navigation.navigate('PartnerHome');
         }
+        
       } else {
-        console.warn('⚠️ Registration failed:', data.message);
+        console.warn(' Registration failed:', data.message);
         Alert.alert('Error', data.message || 'Something went wrong');
       }
     } catch (err) {
-      console.error('❌ Network Error:', err);
+      console.error(' Network Error:', err);
       Alert.alert('Error', 'Registration failed');
     }
   };

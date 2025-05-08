@@ -125,7 +125,7 @@ const WishlistScreen = () => {
         <SortComponent onClose={() => setSortModalVisible(false)} />
       </Modal>
 
-      {/* 🔴 Not Logged In Modal */}
+      {/*  Not Logged In Modal */}
       <Modal visible={showLoginModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
@@ -136,8 +136,7 @@ const WishlistScreen = () => {
               onPress={() => {
                 setShowLoginModal(false);
                 navigation.navigate('Login', { fromScreen: 'Wishlist' });
-              }}
-            >
+              }}>
               <Text style={styles.loginButtonText}>Go to Login</Text>
             </TouchableOpacity>
           </View>

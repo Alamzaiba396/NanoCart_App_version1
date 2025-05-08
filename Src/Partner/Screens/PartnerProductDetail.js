@@ -370,6 +370,7 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
   <Text style={styles.wishlistText}>WISHLIST</Text>
   </TouchableOpacity>
 
+
 <TouchableOpacity
   style={styles.cartButton}
   onPress={async () => {

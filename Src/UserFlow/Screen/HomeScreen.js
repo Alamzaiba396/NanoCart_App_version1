@@ -20,13 +20,13 @@ const HomeScreen = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Header />
-      <CarouselSlider />
-      <PromoBanner />
+      <Header/>
+      <CarouselSlider/>
+      <PromoBanner/>
       <View style={styles.sliderWrapper}>
         <CardSlider images={images} />
       </View>
-      <TrendingDeals />
+      <TrendingDeals/>
     </ScrollView>
   );
 };

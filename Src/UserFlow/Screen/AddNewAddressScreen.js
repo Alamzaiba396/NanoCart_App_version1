@@ -124,7 +124,7 @@ const AddNewAddressScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>ADD ADDRESS</Text>
+        <Text style={styles.headerTitle}>PARTNER ADD ADDRESS</Text>
       </View>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>

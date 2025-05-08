@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
-  Modal, TouchableWithoutFeedback
+
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCartItems } from '../../redux/reducers/cartSlice';
 import Header from '../Component/Header';
 
-const backIcon = require('../../assets/Images/Back.png');
-const cartIcon = require('../../assets/Images/CartIcon.png');
+
 
 const CartScreen = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -184,7 +183,7 @@ const CartScreen = ({ navigation }) => {
         {/* Header */}
        <View style={styles.header}>
              <View style={styles.headerLeft}>
-               <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+               <TouchableOpacity onPress={() => navigation.navigate('UserHome')}>
                  <Image source={require('../../assets/Images/Back.png')} style={styles.backIcon} />
                </TouchableOpacity>
                <Text style={styles.headerTitle}>Cart</Text>

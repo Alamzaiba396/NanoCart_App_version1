@@ -17,7 +17,7 @@ const PartnerSavedAddressScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const response = await fetch('http://10.0.2.2:4000/api/user/address', {
+        const response = await fetch('http://10.0.2.2:4000/api/partner/address', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ const PartnerSavedAddressScreen = ({ navigation }) => {
       key={item._id}
       style={styles.addressBox}
       onPress={() => {
-        navigation.navigate('edit', {
+        navigation.navigate('PartnerEdit', {
           addressId: item._id,   // ✅ This is the correct addressDetail._id
           address: item
         });
@@ -70,7 +70,7 @@ const PartnerSavedAddressScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={22} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>SAVED ADDRESSES</Text>
+        <Text style={styles.headerTitle}> PARTNER SAVED ADDRESSES</Text>
       </View>
 
       {/* Address List */}
@@ -93,8 +93,7 @@ const PartnerSavedAddressScreen = ({ navigation }) => {
       {/* Add New Address */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AddNewAddress')}
-      >
+        onPress={() => navigation.navigate('AddNewAddress')}>
         <Text style={styles.addButtonText}>ADD NEW ADDRESS</Text>
       </TouchableOpacity>
     </View>
@@ -134,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     width: '100%',
   },
   addButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },

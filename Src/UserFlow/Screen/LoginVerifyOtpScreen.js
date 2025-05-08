@@ -1,17 +1,37 @@
-import React, { useState, useRef, } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, Dimensions } from 'react-native';
 import { useDispatch } from "react-redux";
-import { setAuthToken } from "../../redux/reducers/authReducer"; 
-
+import { setAuthToken } from "../../redux/reducers/authReducer";
+import { persistor } from "../../redux/store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const screenWidth = Dimensions.get('window').width;
+const API_URL = "http://10.0.2.2:4000";
 
-  const LoginVerifyOtpScreen = ({ route,navigation }) => {
-    const { fromScreen, actionAfterLogin, itemId ,phone} = route.params;
-    const dispatch = useDispatch();
-    console.log("Phone:", phone);
+const LoginVerifyOtpScreen = ({ route, navigation }) => {
+  const { fromScreen, actionAfterLogin, itemId, phone } = route.params;
+  const dispatch = useDispatch();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const inputs = useRef([]);
-  
+
+  const staticUser = {
+    name: "Prashant kumar",
+    email: "pk@gmail.com",
+    phoneNumber: "7488489897",
+  };
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const interval = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev === 1) clearInterval(interval);
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [resendCooldown]);
+
   const handleOTPChange = (value, index) => {
     if (isNaN(value)) return;
     const otpArray = [...otp];
@@ -31,85 +51,31 @@ const screenWidth = Dimensions.get('window').width;
     }
   };
 
-  
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0) {
+      Alert.alert("Please wait", `You can resend OTP in ${resendCooldown} seconds.`);
+      return;
+    }
 
-  // const handleVerifyOTP = async () => {
-  //   const enteredOTP = otp.join("");
-  //   if (enteredOTP.length !== 6) {
-  //     Alert.alert("Error", "Please enter a valid 6-digit OTP.");
-  //     return;
-  //   }
-    
-  //   const {  phone } = route.params;
-  //   try {
-  //     console.log("Verifying OTP with:", { phoneNumber: phone, otp: enteredOTP });
-  
-  //     const verifyResponse = await fetch("http://10.0.2.2:4000/api/auth/otp/verify", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         phoneNumber: phone,
-  //         otp: enteredOTP,
-  //       }),
-  //     });
+    try {
+      const response = await fetch(`${API_URL}/api/auth/otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: phone }),
+      });
 
-  //     const verifyData = await verifyResponse.json();
-  //     console.log("OTP Verify Response:", verifyData);
-  
-  //     if (verifyResponse.ok && verifyData.success) {
-  //       // OTP verified, now signup
-  //       const loginResponse = await fetch("http://10.0.2.2:4000/api/auth/login", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //         phoneNumber: phone,
-  //         otp: enteredOTP,
-  //         }),
-  //       });
-  //       const loginData = await loginResponse.json();
-  //       console.log("login API Response:", loginData);
-  
-  //       if (loginResponse.ok && loginData.success) {
-  //         const token = loginData.data.token;
-  
-  //         //  Store token in Redux
-  //         dispatch(setAuthToken({ token, user: { phoneNumber: phone } }));
-  
-  //         console.log(" login successful. Token stored in Redux:", token);
-  
-  //         Alert.alert("Success", "Login successful!", [
-  //           {
-  //             text: "OK",
-  //             onPress: () => {
-  //               if (fromScreen === "SubCategoryScreen" && actionAfterLogin === "like_item") {
-  //                 navigation.navigate("SubCategoryScreen", { likedItemId: itemId });
-  //               }else if (fromScreen === "Cart") {
-  //                 navigation.navigate("Cart");
-  //               } else {
-  //                 navigation.navigate("Home");
-  //               } 
-  //             },
-  //           },
-  //         ]);
-          
-  //       } else {
-  //         Alert.alert("Signup Failed", loginData.message || "Something went wrong during signup.");
-  //       }
-  //     } else if (verifyData.message === "OTP expired") {
-  //       Alert.alert("Error", "Your OTP has expired. Please request a new one.");
-  //     } else {
-  //       Alert.alert("OTP Verification Failed", verifyData.message || "Invalid OTP.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     Alert.alert("Error", "Something went wrong. Please try again.");
-  //   }
-  // };
-  
+      const data = await response.json();
+      if (response.ok && data.success) {
+        Alert.alert("Success", "OTP resent successfully!");
+        setResendCooldown(30);
+      } else {
+        Alert.alert("Error", data.message || "Failed to resend OTP.");
+      }
+    } catch (error) {
+      console.error("Resend OTP Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
+  };
 
   const handleVerifyOTP = async () => {
     const enteredOTP = otp.join("");
@@ -118,92 +84,69 @@ const screenWidth = Dimensions.get('window').width;
       return;
     }
   
-    const { phone, fromScreen, actionAfterLogin, itemId } = route.params;
-  
     try {
       console.log("Verifying OTP with:", { phoneNumber: phone, otp: enteredOTP });
   
-      const verifyResponse = await fetch("http://10.0.2.2:4000/api/auth/otp/verify", {
+      const verifyResponse = await fetch(`${API_URL}/api/auth/otp/verify`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phoneNumber: phone,
-          otp: enteredOTP,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: phone, otp: enteredOTP }),
       });
   
       const verifyData = await verifyResponse.json();
       console.log("OTP Verify Response:", verifyData);
   
-      if (verifyResponse.ok && verifyData.success) {
-        // Step 2: Login after OTP verification
-        const loginResponse = await fetch("http://10.0.2.2:4000/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            phoneNumber: phone,
-            otp: enteredOTP,
-          }),
-        });
-  
-        const loginData = await loginResponse.json();
-        console.log("Login API Response:", loginData);
-  
-        if (loginResponse.ok && loginData.success) {
-          const { token, role, user } = loginData.data;
-  
-          // ✅ Store token and role in Redux
-          dispatch(setAuthToken({ token, role, user }));
-  
-          console.log("✅ Login successful. Token stored:", token);
-          console.log("User role:", role);
-  
-          Alert.alert("Success", "Login successful!", [
-            {
-              text: "OK",
-              onPress: () => {
-                // ✅ Navigate based on role
-                if (role === "Partner") {
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: "PartnerHome" }],
-                  });
-                } else if (role === "User") {
-                  if (fromScreen === "SubCategoryScreen" && actionAfterLogin === "like_item") {
-                    navigation.navigate("SubCategoryScreen", { likedItemId: itemId });
-                  } else if (fromScreen === "Cart") {
-                    navigation.navigate("Cart");
-                  } else {
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: "UserHome" }],
-                    });
-                  }
-                } else {
-                  // Unknown role
-                  Alert.alert("Error", "Unrecognized role. Please contact support.");
-                }
-              },
-            },
-          ]);
-        } else {
-          Alert.alert("Login Failed", loginData.message || "Something went wrong during login.");
+      if (!verifyResponse.ok || !verifyData.success) {
+        if (verifyData.message === "OTP expired") {
+          throw new Error("Your OTP has expired. Please request a new one.");
         }
-      } else if (verifyData.message === "OTP expired") {
-        Alert.alert("Error", "Your OTP has expired. Please request a new one.");
-      } else {
-        Alert.alert("OTP Verification Failed", verifyData.message || "Invalid OTP.");
+        throw new Error(verifyData.message || "Invalid OTP.");
       }
+  
+      const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: phone, otp: enteredOTP }),
+      });
+  
+      const loginData = await loginResponse.json();
+      console.log("Login API Response:", loginData);
+  
+      if (!loginResponse.ok || !loginData.success) {
+        throw new Error(loginData.message || "Login failed.");
+      }
+  
+      const { token, role } = loginData.data;
+  
+      await dispatch(setAuthToken({ token, role, user: staticUser }));
+
+// Wait for Redux to save state to AsyncStorage
+await new Promise((resolve) => setTimeout(resolve, 300));
+
+await persistor.flush();
+console.log("✅ Persistor flushed after login");
+const data = await AsyncStorage.getItem("persist:auth");
+console.log("✅ Saved Auth State:", data ? JSON.parse(data) : null);
+  
+      const targetScreen =
+        role === "Partner"
+          ? "PartnnerHome"
+          : fromScreen === "SubCategoryScreen" && actionAfterLogin === "like_item"
+          ? { name: "SubCategory", params: { likedItemId: itemId } }
+          : fromScreen === "Cart"
+          ? "Cart"
+          : "UserHome";
+  
+      navigation.reset({
+        index: 0,
+        routes: [typeof targetScreen === "string" ? { name: targetScreen } : targetScreen],
+      });
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert("Error", error.message || "Something went wrong. Please try again.");
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -233,56 +176,22 @@ const screenWidth = Dimensions.get('window').width;
           ))}
         </View>
 
-        {/* <Text style={styles.resendText}>
+        <Text style={styles.resendText}>
           Didn't receive OTP?{' '}
-          <Text style={styles.resendLink} onPress={() => Alert.alert("Resend", "OTP resent successfully!")}>
-            Resend
+          <Text
+            style={[styles.resendLink, resendCooldown > 0 && { color: '#888' }]}
+            onPress={handleResendOTP}
+          >
+            Resend {resendCooldown > 0 ? `(${resendCooldown}s)` : ''}
           </Text>
-        </Text> */}
-
-
-<Text style={styles.resendText}>
-  Didn't receive OTP?{' '}
-  <Text
-    style={styles.resendLink}
-    onPress={async () => {
-      try {
-        const response = await fetch("http://10.0.2.2:4000/api/auth/otp", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            phoneNumber: phone,
-          }),
-        });
-
-        const data = await response.json();
-        console.log("Resend OTP Response:", data);
-
-        if (response.ok && data.success) {
-          Alert.alert("Success", "OTP resent successfully!");
-        } else {
-          Alert.alert("Error", data.message || "Failed to resend OTP.");
-        }
-      } catch (error) {
-        console.error("Resend OTP Error:", error);
-        Alert.alert("Error", "Something went wrong. Please try again.");
-      }
-    }}
-  >
-    Resend
-  </Text>
-</Text>
-
+        </Text>
       </View>
 
       <View style={styles.bottomSection}>
-      <TouchableOpacity style={styles.continueButton} onPress={handleVerifyOTP}>
-  <Text style={styles.continueText}>CONTINUE</Text>
-  <Image source={require('../../assets/Images/Forward.png')} style={styles.arrowIcon} />
-</TouchableOpacity>
-
+        <TouchableOpacity style={styles.continueButton} onPress={handleVerifyOTP}>
+          <Text style={styles.continueText}>CONTINUE</Text>
+          <Image source={require('../../assets/Images/Forward.png')} style={styles.arrowIcon} />
+        </TouchableOpacity>
 
         <Text style={styles.footerText}>
           Having trouble logging in?{' '}
