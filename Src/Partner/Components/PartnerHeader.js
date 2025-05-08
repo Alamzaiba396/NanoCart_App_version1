@@ -14,7 +14,7 @@ const PartnerHeader = () => {
   const { width } = useWindowDimensions();
   const navigation = useNavigation();
   const cartItems = useSelector(state => state.cart.items);
-  const token = useSelector(state => state.auth.token); // 👈 get token
+  const token = useSelector(state => state.auth.token); //  get token
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCartPress = () => {

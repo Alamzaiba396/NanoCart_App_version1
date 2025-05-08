@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Header from '../../UserFlow/Component/Header';
-
 import FilterComponent from '../../UserFlow/Component/FilterComponent';
 import SortComponent from '../../UserFlow/Component/SortComponent';
 import PartnerSubCategoryItem from '../Components/PartnerSubCategoryItem';

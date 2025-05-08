@@ -203,7 +203,6 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
         </PartnerAccordionItem>
 
 
-
 {PPQ?.length > 0 && (
   <PartnerAccordionItem title="Pricing Per Quantity">
     {PPQ.map((ppqItem, index) => (
@@ -228,7 +227,6 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
     ))}
   </PartnerAccordionItem>
 )}
-
 
 
 <PartnerAccordionItem title="Choose Items">
@@ -317,8 +315,6 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
 </PartnerAccordionItem>
 
 
-
-
         <PartnerAccordionItem title="Return Policies">
           <Text>{returnPolicy}</Text>
         </PartnerAccordionItem>
@@ -371,7 +367,7 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
   </TouchableOpacity>
 
 
-<TouchableOpacity
+  <TouchableOpacity
   style={styles.cartButton}
   onPress={async () => {
     console.log('🛒 Add to cart button pressed');
@@ -385,39 +381,40 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
       return;
     }
 
-    const selectedColorObj = imagesByColor.find(colorObj =>
-      colorObj.images.some(img => img.url === selectedColorImages[0]?.url)
+    // Construct the orderDetails array
+    const orderDetails = imagesByColor.map((colorObj) => ({
+      color: colorObj.color,
+      sizeAndQuantity: colorObj.sizes.map((sizeObj) => ({
+        size: sizeObj.size,
+        quantity: sizeObj.quantity || 1, // Default quantity to 1 if not provided
+        skuId: sizeObj.skuId,
+      })),
+    }));
+
+    // Calculate totalQuantity and totalPrice
+    const totalQuantity = orderDetails.reduce(
+      (total, colorObj) =>
+        total +
+        colorObj.sizeAndQuantity.reduce(
+          (subTotal, sizeObj) => subTotal + sizeObj.quantity,
+          0
+        ),
+      0
     );
 
-    const selectedColor = selectedColorObj?.color || 'Black';
-
-    console.log(' Selected Color:', selectedColor);
-
-    // Get selected size (you can make user select size dynamically later)
-    const selectedSizeObj = selectedColorObj?.sizes?.[0]; // take first available size for now
-    const selectedSize = selectedSizeObj?.size || '';
-    const skuId = selectedSizeObj?.skuId || '';
-
-    console.log(' Selected Size:', selectedSize);
-    console.log(' Selected SKU ID:', skuId);
-
-    if (!selectedSize || !skuId) {
-      alert('Please select a valid size.');
-      return;
-    }
+    const totalPrice = totalQuantity * selectedPrice; // Assuming `selectedPrice` is defined
 
     const payload = {
       itemId: product.itemId._id,
-      quantity: 1, // default 1
-      size: selectedSize,
-      color: selectedColor,
-      skuId: skuId,
+      orderDetails,
+      totalQuantity,
+      totalPrice,
     };
 
     console.log(' Cart Payload:', payload);
 
     try {
-      const response = await fetch('http://10.0.2.2:4000/api/usercart/create', {
+      const response = await fetch('http://10.0.2.2:4000/api/partner/cart/create', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -432,7 +429,7 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
 
       if (response.ok) {
         alert('Added to cart successfully.');
-        navigation.navigate('Cart'); // ✅ navigate to cart
+        navigation.navigate('PartnerCart'); // ✅ navigate to cart
       } else {
         alert(data.message || 'Failed to add to cart.');
       }
@@ -440,7 +437,8 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
       console.error(' Cart API Error:', error);
       alert('Something went wrong while adding to cart.');
     }
-  }}>
+  }}
+>
   <Feather name="shopping-cart" size={18} color="#fff" />
   <Text style={styles.cartText}>ADD TO CART</Text>
 </TouchableOpacity>
