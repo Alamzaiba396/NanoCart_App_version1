@@ -1,3 +1,4 @@
+// PartnerHeader.js
 import React from 'react';
 import {
   View,
@@ -13,15 +14,23 @@ import { useSelector } from 'react-redux';
 const PartnerHeader = () => {
   const { width } = useWindowDimensions();
   const navigation = useNavigation();
-  const cartItems = useSelector(state => state.cart.items);
-  const token = useSelector(state => state.auth.token); //  get token
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartItems = useSelector((state) => state.cart.items);
+  const token = useSelector((state) => state.auth.token);
+
+  const totalCartCount = cartItems.reduce((sum, item) => {
+    const count = item.orderDetails.reduce(
+      (colorSum, colorObj) =>
+        colorSum + colorObj.sizeAndQuantity.reduce((sizeSum, s) => sizeSum + s.quantity, 0),
+      0
+    );
+    return sum + count;
+  }, 0);
 
   const handleCartPress = () => {
     if (token) {
       navigation.navigate('PartnerCart');
     } else {
-      navigation.navigate('Login', { fromScreen: 'PartnerHeader' }); // Optional: pass context
+      navigation.navigate('Login', { fromScreen: 'PartnerHeader' });
     }
   };
 
@@ -39,32 +48,30 @@ const PartnerHeader = () => {
           marginTop: 25,
         }}
       >
-        {/* Logo */}
         <Image
           source={require('../../assets/Images/Headerlogo.png')}
           style={{ width: 110, height: 35, resizeMode: 'contain' }}
         />
 
-        {/* Right icons */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ marginRight: 12, fontWeight: '600', fontSize: 14 }}>₹ INR partner</Text>
 
-          {/* Search Icon */}
-          <TouchableOpacity style={{ marginRight: 20 }} onPress={() => navigation.navigate('PartnerSearch')}>
+          <TouchableOpacity
+            style={{ marginRight: 20 }}
+            onPress={() => navigation.navigate('PartnerSearch')}
+          >
             <Image
               source={require('../../assets/Images/SearchIcon.png')}
               style={{ width: 20, height: 20, resizeMode: 'contain' }}
             />
           </TouchableOpacity>
 
-          {/* Cart Icon with Badge */}
           <TouchableOpacity onPress={handleCartPress} style={{ position: 'relative' }}>
             <Image
               source={require('../../assets/Images/Cart.png')}
               style={{ width: 24, height: 24, resizeMode: 'contain' }}
             />
 
-            {/* Badge */}
             {totalCartCount > 0 && (
               <View
                 style={{

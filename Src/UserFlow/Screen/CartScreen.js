@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
-
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCartItems } from '../../redux/reducers/cartSlice';
-import Header from '../Component/Header';
-
-
 
 const CartScreen = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -19,7 +15,7 @@ const CartScreen = ({ navigation }) => {
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ total quantity
+    const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ total quantity
 
   useEffect(() => {
     if (authToken) {

@@ -16,6 +16,7 @@ const Header = () => {
   const cartItems = useSelector(state => state.cart.items);
   const token = useSelector(state => state.auth.token); // 👈 get token
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  console.log('Total Cart Count:', totalCartCount); // Debugging line
 
   const handleCartPress = () => {
     if (token) {

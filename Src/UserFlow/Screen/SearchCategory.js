@@ -44,10 +44,10 @@ const SearchCategory = () => {
             placeholder="Search your style"
             placeholderTextColor="#888"
             style={styles.searchInput}
+            onFocus={() => navigation.navigate('SubCategoryItemScreen')}
           />
         </View>
       </View>
-
       {/* Recent Searches */}
       <Text style={styles.sectionTitle}>Recent Searches</Text>
       <FlatList

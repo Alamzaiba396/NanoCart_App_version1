@@ -146,23 +146,23 @@ const [pollingInterval, setPollingInterval] = useState(null);
       console.log(' API Response:', data);
   
       if (res.ok && data.success) {
-        const isVerified = data?.data?.isVerified;
-        const isActive = data?.data?.isActive;
-        const message = data.message;
-        
-        if (!isVerified || !isActive) {
-          console.log(' Partner is not verified or not active. Awaiting admin approval.');
-          Alert.alert(
-            'Success',
-            `${message}\n\nPlease wait for admin approval before logging in.`
-          );
-          return; // wait for admin, do NOT navigate
-        } else {
-          console.log('✅ Partner is verified and active. Navigating to Home.');
-          Alert.alert('Success', 'Registration complete and approved!');
-          navigation.navigate('PartnerHome');
-        }
-        
+       const isVerified = data?.data?.isVerified;
+       const isActive = data?.data?.isActive;
+       const message = data.message;
+
+if (!isVerified || !isActive) {
+  console.log(' Partner is not verified or not active. Awaiting admin approval.');
+  Alert.alert(
+    'Success',
+    `${message}\n\nPlease wait for admin approval before logging in.`
+  );
+  return; // wait for admin, do NOT navigate
+} else {
+  console.log('✅ Partner is verified and active. Navigating to Home.');
+  Alert.alert('Success', 'Registration complete and approved!');
+  navigation.navigate('PartnerHome');
+}
+
       } else {
         console.warn(' Registration failed:', data.message);
         Alert.alert('Error', data.message || 'Something went wrong');

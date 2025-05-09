@@ -1,5 +1,3 @@
-
-
 // export default SubCategoryItem;
 import React, { useState } from 'react';
 import {
@@ -25,7 +23,7 @@ const SubCategoryItem = ({ item, navigation }) => {
     const color = item?.defaultColor || 'Black';
 
     if (!itemId) {
-      console.warn('❌ item.itemId is missing');
+      console.warn(' item.itemId is missing');
       return;
     }
 
@@ -57,7 +55,7 @@ const SubCategoryItem = ({ item, navigation }) => {
         Alert.alert('Error', data.message || 'Failed to add to wishlist');
       }
     } catch (error) {
-      console.error('❌ Wishlist API error:', error);
+      console.error(' Wishlist API error:', error);
       Alert.alert('Error', 'Something went wrong while adding to wishlist');
     }
   };

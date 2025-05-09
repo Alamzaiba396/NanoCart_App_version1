@@ -11,7 +11,7 @@ import {
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authReducer';
-
+import { clearCart } from '../../redux/reducers/cartSlice';
 const MyAccountScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -186,6 +186,7 @@ const MyAccountScreen = () => {
         <TouchableOpacity
           onPress={() => {
             dispatch(logout());
+            dispatch(clearCart());
             navigation.replace('Login');
           }}
           style={styles.logoutButton}>

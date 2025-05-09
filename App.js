@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { AppState } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Provider, useSelector } from "react-redux";
 import { store, persistor } from "./Src/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { setCartItems } from './Src/redux/reducers/cartSlice';
 
 // Screens
 import SplashScreen from "./Src/UserFlow/Screen/SplashScreen";
@@ -69,7 +70,6 @@ const AuthNavigator = () => (
     <Stack.Screen name="UserRegister" component={RegisterScreen} />
     <Stack.Screen name="LoginVerifyOtp" component={LoginVerifyOtpScreen} />
     <Stack.Screen name="RegisterVerifyOtp" component={RegisterVerificationScreen} />
-    <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
     <Stack.Screen name="BottomTabBar" component={BottomTabBar} />
     <Stack.Screen name="Search" component={SearchCategory} />
     <Stack.Screen name="PartnerSearch" component={PartnerSearchCategory} />
@@ -109,10 +109,11 @@ const UserNavigator = () => (
     <Stack.Screen name="ReturnExchange" component={ReturnExchangeScreen} />
     <Stack.Screen name="ReturnConfirm" component={ReturnConfirmationScreen} />
     <Stack.Screen name="TBYB" component={TBYBScreen} />
+    <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} />
   </Stack.Navigator>
 );
 
-// 🛍️ Partner stack
+//  Partner stack
 const PartnerNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="PartnnerHome" component={PartnerBottomTabBar} />
@@ -141,6 +142,30 @@ const MainNavigator = () => {
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.role);
 
+  const dispatch = useDispatch();
+
+  //  Fetch cart on app startup if token exists
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await fetch('http://10.0.2.2:4000/api/usercart', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          dispatch(setCartItems(data.data.items));
+        } else {
+          console.warn('Failed to fetch cart:', data.message);
+        }
+      } catch (error) {
+        console.error('Cart load error on startup:', error);
+      }
+    };
+
+    if (token) fetchCartItems();
+  }, [token]);
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {token ? (
@@ -156,7 +181,7 @@ const MainNavigator = () => {
   );
 };
 
-// 🎬 App Entry Point
+//  App Entry Point
 const App = () => {
   const [rehydrated, setRehydrated] = useState(false);
 
