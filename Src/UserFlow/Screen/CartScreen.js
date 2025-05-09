@@ -33,10 +33,10 @@ const CartScreen = ({ navigation }) => {
       if (response.ok) {
         dispatch(setCartItems(data.data.items));
       } else {
-        console.error('❌ Error fetching cart:', data.message);
+        console.error(' Error fetching cart:', data.message);
       }
     } catch (error) {
-      console.error('🔥 Error in fetchCartItems:', error);
+      console.error(' Error in fetchCartItems:', error);
     }
   };
 
@@ -89,10 +89,10 @@ const CartScreen = ({ navigation }) => {
       if (response.ok) {
         fetchCartItems();
       } else {
-        console.error('❌ Failed to update quantity:', data.message);
+        console.error(' Failed to update quantity:', data.message);
       }
     } catch (error) {
-      console.error('🔥 Error updating quantity:', error);
+      console.error(' Error updating quantity:', error);
     }
   };
 

@@ -32,7 +32,7 @@ const { width } = Dimensions.get('window');
   const [selectedColorImages, setSelectedColorImages] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [quantity, setQuantity] = useState(0);
-const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
+  const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -132,7 +132,7 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
       <ScrollView contentContainerStyle={{ paddingBottom: 180 }} showsVerticalScrollIndicator={false}>
         {/* Main Image & Thumbnails */}
         <View style={styles.imageSection}>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('ProductDetailPhoto', { images: selectedColorImages })}>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('PartnerProductPhoto', { images: selectedColorImages })}>
             <Image source={{ uri: selectedColorImages[0]?.url }} style={styles.mainImage} resizeMode="cover" />
           </TouchableWithoutFeedback>
           <ScrollView style={styles.sideImages} showsVerticalScrollIndicator={true}>
@@ -429,7 +429,7 @@ const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
 
       if (response.ok) {
         alert('Added to cart successfully.');
-        navigation.navigate('PartnerCart'); // ✅ navigate to cart
+        navigation.navigate('PartnerCart'); // 
       } else {
         alert(data.message || 'Failed to add to cart.');
       }

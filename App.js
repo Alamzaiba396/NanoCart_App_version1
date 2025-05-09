@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { AppState } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -59,6 +59,7 @@ import PartnerOrderHistoryScreen from "./Src/Partner/Screens/PartnerOrderHistory
 import PartnerCartScreen from "./Src/Partner/Screens/PartnerCartScreen";
 import PartnerWishlistScreen from "./Src/Partner/Screens/PartnerWishlistScreen";
 import PartnerPaymentScreen from "./Src/Partner/Screens/PartnerPaymentScreen";
+import PartnerProductDetailPhotoScreen from "./Src/Partner/Screens/PartnerProductDetailPhotoScreen";
 
 const Stack = createStackNavigator();
 
@@ -134,6 +135,7 @@ const PartnerNavigator = () => (
     <Stack.Screen name="PartnerCart" component={PartnerCartScreen} />
     <Stack.Screen name="PartnerWishlist" component={PartnerWishlistScreen} />
     <Stack.Screen name="PartnerPayment" component={PartnerPaymentScreen} />
+    <Stack.Screen name="PartnerProductPhoto" component={PartnerProductDetailPhotoScreen} />
   </Stack.Navigator>
 );
 

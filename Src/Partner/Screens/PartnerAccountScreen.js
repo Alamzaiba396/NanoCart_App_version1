@@ -1,9 +1,70 @@
-import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 
-const PartnerAccountScreen = () => {
+
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+
+  const PartnerAccountScreen = () => {
   const navigation = useNavigation();
+  const token = useSelector(state => state.auth.token);
+  const [partnerName, setPartnerName] = useState('');
+
+
+  useEffect(() => {
+    const fetchPartnerName = async () => {
+      try {
+        console.log(' Starting fetchPartnerName...');
+        console.log(' Token:', token);
+  
+        const res = await fetch('http://10.0.2.2:4000/api/auth/partner/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        console.log(' Response status:', res.status);
+  
+        const data = await res.json();
+        console.log(' Full Response JSON:', data);
+  
+        if (res.ok && data.success) {
+          const name = data?.data?.partnerId?.name;
+          console.log(' Extracted partner name:', name);
+          setPartnerName(name || 'Partner');
+        } else {
+          console.warn(' Failed condition: res.ok && data.success', {
+            resOk: res.ok,
+            success: data.success,
+            message: data.message,
+          });
+          Alert.alert('Error', 'Failed to fetch profile');
+        }
+      } catch (error) {
+        console.error(' Exception while fetching partner profile:', error);
+        Alert.alert('Error', 'Something went wrong');
+      }
+    };
+  
+    if (token) {
+      console.log(' Token available, calling fetchPartnerName...');
+      fetchPartnerName();
+    } else {
+      console.warn(' No token available in Redux');
+    }
+  }, [token]);
+  
+  
+
 
   return (
     <View style={styles.container}>
@@ -16,7 +77,7 @@ const PartnerAccountScreen = () => {
           />
         </TouchableOpacity>
         <Text style={styles.headerText}>MY ACCOUNT</Text>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{ flexDirection: 'row' }}>
           <Image
             source={require('../../assets/Images/SearchIcon.png')}
             style={styles.icon}
@@ -34,23 +95,24 @@ const PartnerAccountScreen = () => {
           source={require('../../assets/Images/Group.png')}
           style={styles.logo}
         />
-        <Text style={styles.greeting}>Hi, Anuradha</Text>
+        <Text style={styles.greeting}>Hi, {partnerName}</Text>
       </View>
 
       {/* Menu Items */}
       <View style={styles.menu}>
         {[
-          {label: 'Profile', route: 'Profile'},
-          {label: 'Order History', route: 'OrderConfirmation'},
-          {label: 'Saved Address'},
-          {label: 'My Wallet', route: 'PartnerWallet'},
-          {label: 'Settings'},
-          {label: 'Help Centre', route: 'PartnerCatalogue'},
+          { label: 'Profile', route: 'Profile' },
+          { label: 'Order History', route: 'OrderConfirmation' },
+          { label: 'Saved Address' },
+          { label: 'My Wallet', route: 'PartnerWallet' },
+          { label: 'Settings' },
+          { label: 'Help Centre', route: 'PartnerCatalogue' },
         ].map((item, index) => (
           <TouchableOpacity
             key={index}
             style={styles.menuItem}
-            onPress={() => item.route && navigation.navigate(item.route)}>
+            onPress={() => item.route && navigation.navigate(item.route)}
+          >
             <Text style={styles.menuText}>{item.label}</Text>
             <Image
               source={require('../../assets/Images/arrowright.png')}
@@ -63,12 +125,14 @@ const PartnerAccountScreen = () => {
       {/* Logout Button */}
       <TouchableOpacity
         onPress={() => navigation.navigate('Login')}
-        style={styles.logoutButton}>
+        style={styles.logoutButton}
+      >
         <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
 export default PartnerAccountScreen;
 
 const styles = StyleSheet.create({

@@ -24,45 +24,40 @@ const PartnerProfileScreen = () => {
   const [panNo, setPanNo] = useState('');
   const [shopAddress, setShopAddress] = useState('');
   const [pincode, setPincode] = useState('');
-  const [town, setTown] = useState('');
-  const [state, setState] = useState('');
-  const [mapLink, setMapLink] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch('http://10.0.2.2:4000/api/auth/profile', {
+        const response = await fetch('http://10.0.2.2:4000/api/auth/partner/profile', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
+
         const data = await response.json();
         if (response.ok && data?.data) {
           const d = data.data;
-          setName(d.name || '');
-          setEmail(d.email || '');
-          setMobile(d.phoneNumber || '');
+          const partner = d.partnerId || {};
+          setName(partner.name || '');
+          setEmail(partner.email || '');
+          setMobile(partner.phoneNumber || '');
           setShopName(d.shopName || '');
-          setGstNo(d.gstNo || '');
-          setPanNo(d.panNo || '');
+          setGstNo(d.gstNumber || '');
+          setPanNo(d.panNumber || '');
           setShopAddress(d.shopAddress || '');
           setPincode(d.pincode || '');
-          setTown(d.town || '');
-          setState(d.state || '');
-          setMapLink(d.mapLink || '');
         } else {
           Alert.alert('Error', 'Failed to load profile');
         }
       } catch (err) {
         Alert.alert('Error', 'Something went wrong');
+        console.error(err);
       }
     };
 
-    if (token) {
-      fetchProfile();
-    }
+    if (token) fetchProfile();
   }, [token]);
 
   return (
@@ -72,34 +67,30 @@ const PartnerProfileScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={22} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>PROFILE</Text>
+        <Text style={styles.headerTitle}>PARTNER PROFILE</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <InputLabel title="Name" value={name} onChange={setName} />
-        <InputLabel title="Mobile" value={`+91-${mobile}`} editable={false} />
-        <InputLabel title="Email ID" value={email} onChange={setEmail} />
-        <InputLabel title="Shop Name" value={shopName} onChange={setShopName} />
-        <InputLabel title="GST No" value={gstNo} onChange={setGstNo} />
-        <InputLabel title="PAN No" value={panNo} onChange={setPanNo} />
-        <InputLabel title="Shop Address" value={shopAddress} onChange={setShopAddress} />
-        <InputLabel title="Pincode" value={pincode} onChange={setPincode} />
-        <InputLabel title="Town/City" value={town} onChange={setTown} />
-        <InputLabel title="State" value={state} onChange={setState} />
-        <InputLabel title="Google Map Address Link" value={mapLink} onChange={setMapLink} />
+        <InputLabel title="Name" value={name} />
+        <InputLabel title="Mobile" value={`+91-${mobile}`} />
+        <InputLabel title="Email ID" value={email} />
+        <InputLabel title="Shop Name" value={shopName} />
+        <InputLabel title="GST No" value={gstNo} />
+        <InputLabel title="PAN No" value={panNo} />
+        <InputLabel title="Shop Address" value={shopAddress} />
+        <InputLabel title="Pincode" value={pincode} />
       </ScrollView>
     </View>
   );
 };
 
-const InputLabel = ({ title, value, onChange, editable = true }) => (
+const InputLabel = ({ title, value }) => (
   <View style={styles.inputGroup}>
     <Text style={styles.label}>{title}</Text>
     <TextInput
-      style={[styles.input, !editable && { color: '#999' }]}
+      style={styles.input}
       value={value}
-      editable={editable}
-      onChangeText={onChange}
+      editable={false}
     />
   </View>
 );
@@ -134,7 +125,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 15,
-    color: '#000',
+    color: '#555',
     paddingVertical: 6,
     borderBottomWidth: 1,
     borderColor: '#ccc',
