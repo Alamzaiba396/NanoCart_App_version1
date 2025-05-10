@@ -32,7 +32,8 @@ const PartnerProductDetail = () => {
   const [selectedColorImages, setSelectedColorImages] = useState([]);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [sizes, setSizes] = useState([]);
-  const [quantity, setQuantity] = useState(0);
+  const [quantities, setQuantities] = useState({}); // Track quantities per color and size: { "Black": { "S": 3, "M": 2 }, "Grey": { "S": 1 } }
+  const [selectedSizes, setSelectedSizes] = useState([]); // Track selected sizes for the current color
   const [availableColors, setAvailableColors] = useState([]); // State for colors from API
   const selectedPrice = product?.PPQ?.[0]?.pricePerUnit || 0;
 
@@ -51,6 +52,17 @@ const PartnerProductDetail = () => {
           if (productData.imagesByColor?.length > 0) {
             setSelectedColorImages(productData.imagesByColor[0].images);
             setSizes(productData.imagesByColor[0].sizes || []);
+            // Initialize quantities for each color
+            const initialQuantities = {};
+            (json.colors || []).forEach(colorObj => {
+              initialQuantities[colorObj.color] = {};
+              productData.imagesByColor
+                .find(c => c.color === colorObj.color)
+                ?.sizes.forEach(sizeObj => {
+                  initialQuantities[colorObj.color][sizeObj.size] = 0;
+                });
+            });
+            setQuantities(initialQuantities);
           }
         }
       } catch (err) {
@@ -133,6 +145,41 @@ const PartnerProductDetail = () => {
     }
   };
 
+  // Get the current color based on selectedColorIndex
+  const currentColor = availableColors[selectedColorIndex]?.color || '';
+
+  // Toggle size selection
+  const toggleSizeSelection = (size) => {
+    setSelectedSizes(prevSizes => {
+      if (prevSizes.includes(size)) {
+        return prevSizes.filter(s => s !== size);
+      } else {
+        return [...prevSizes, size];
+      }
+    });
+  };
+
+  // Update quantity for a specific size for the current color
+  const updateQuantityForSize = (size, delta) => {
+    setQuantities(prev => {
+      const newQuantities = { ...prev };
+      const currentQty = newQuantities[currentColor][size] || 0;
+      newQuantities[currentColor][size] = Math.max(0, currentQty + delta);
+      return newQuantities;
+    });
+  };
+
+  // Calculate the overall total quantity across all colors and sizes
+  const calculateOverallTotalQuantity = () => {
+    let total = 0;
+    Object.keys(quantities).forEach(color => {
+      Object.keys(quantities[color]).forEach(size => {
+        total += quantities[color][size] || 0;
+      });
+    });
+    return total;
+  };
+
   return (
     <View style={styles.container}>
       <PartnerHeader />
@@ -165,15 +212,17 @@ const PartnerProductDetail = () => {
               key={idx}
               style={[
                 styles.colorBox,
-                { backgroundColor: colorObj.hexCode }, // Use hexCode from API
-                selectedColorIndex === idx && styles.selectedColorBox, // Highlight selected color
+                { backgroundColor: colorObj.hexCode },
+                selectedColorIndex === idx && styles.selectedColorBox,
               ]}
               onPress={() => {
                 setSelectedColorIndex(idx);
                 const colorMatch = imagesByColor.find((c) => c.color === colorObj.color);
                 if (colorMatch) {
                   setSelectedColorImages(colorMatch.images);
-                  setSizes(colorMatch.sizes || []);
+                  const newSizes = colorMatch.sizes || [];
+                  setSizes(newSizes);
+                  setSelectedSizes([]); // Reset selected sizes when changing color
                 }
               }}
             />
@@ -203,7 +252,14 @@ const PartnerProductDetail = () => {
             </View>
             <View style={styles.sizeOptions}>
               {sizes.map((sz, idx) => (
-                <TouchableOpacity key={idx} style={styles.sizeBox}>
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.sizeBox,
+                    selectedSizes.includes(sz.size) && styles.selectedSizeBox,
+                  ]}
+                  onPress={() => toggleSizeSelection(sz.size)}
+                >
                   <Text style={styles.sizeBoxText}>{sz.size}</Text>
                 </TouchableOpacity>
               ))}
@@ -243,7 +299,7 @@ const PartnerProductDetail = () => {
 
         <PartnerAccordionItem title="Choose Items">
           <View style={{ paddingVertical: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>Select Quantity</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>Select Items</Text>
 
             {/* Color Buttons Row */}
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
@@ -252,7 +308,7 @@ const PartnerProductDetail = () => {
                   key={idx}
                   style={[
                     styles.quantityColorBox,
-                    { backgroundColor: colorObj.hexCode }, // Use hexCode from API
+                    { backgroundColor: colorObj.hexCode },
                     selectedColorIndex === idx && styles.selectedColorBox,
                   ]}
                   onPress={() => {
@@ -260,38 +316,109 @@ const PartnerProductDetail = () => {
                     const colorMatch = imagesByColor.find((c) => c.color === colorObj.color);
                     if (colorMatch) {
                       setSelectedColorImages(colorMatch.images);
-                      setSizes(colorMatch.sizes || []);
+                      const newSizes = colorMatch.sizes || [];
+                      setSizes(newSizes);
+                      setSelectedSizes([]); // Reset selected sizes when changing color
+
+                      // Log the selected color, quantities, and sizes
+                      const sizeList = newSizes.map(sizeObj => sizeObj.size);
+                      const quantitiesForColor = quantities[colorObj.color] || {};
+                      console.log('Selected Color:', colorObj.color);
+                      console.log('Quantities for this color:', quantitiesForColor);
+                      console.log('Sizes:', sizeList);
+                      console.log('Overall Quantities:', quantities);
+                      console.log('Overall Total Quantity:', calculateOverallTotalQuantity());
                     }
                   }}
                 />
               ))}
             </View>
 
-            {/* Quantity Selector */}
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-              <TouchableOpacity onPress={() => setQuantity(prev => Math.max(0, prev - 1))}>
-                <Feather name="chevron-down" size={24} color="#d2691e" />
-              </TouchableOpacity>
-              <Text style={{ marginHorizontal: 20, fontSize: 18 }}>{quantity}</Text>
-              <TouchableOpacity onPress={() => setQuantity(prev => prev + 1)}>
-                <Feather name="chevron-up" size={24} color="#d2691e" />
-              </TouchableOpacity>
-            </View>
+            {/* Size Selection and Quantity Selector */}
+            {sizes.length > 0 && (
+              <View style={{ marginTop: 10 }}>
+                <Text style={{ fontSize: 14, textAlign: 'center', marginBottom: 5 }}>
+                  Select Sizes
+                </Text>
+                <View style={styles.sizeOptions}>
+                  {sizes.map((sz, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[
+                        styles.sizeBox,
+                        selectedSizes.includes(sz.size) && styles.selectedSizeBox,
+                      ]}
+                      onPress={() => toggleSizeSelection(sz.size)}
+                    >
+                      <Text style={styles.sizeBoxText}>{sz.size}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Quantity Selector for Selected Sizes */}
+            {selectedSizes.length > 0 && (
+              <View style={{ marginTop: 10 }}>
+                <Text style={{ fontSize: 14, textAlign: 'center', marginBottom: 5 }}>
+                  Set Quantity for Selected Sizes
+                </Text>
+                {selectedSizes.map((size, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginVertical: 5,
+                      paddingHorizontal: 10,
+                    }}
+                  >
+                    <Text style={{ fontSize: 14 }}>Size: {size}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <TouchableOpacity
+                        onPress={() => updateQuantityForSize(size, -1)}
+                      >
+                        <Feather name="chevron-down" size={20} color="#d2691e" />
+                      </TouchableOpacity>
+                      <Text style={{ marginHorizontal: 15, fontSize: 14 }}>
+                        {quantities[currentColor]?.[size] || 0}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => updateQuantityForSize(size, 1)}
+                      >
+                        <Feather name="chevron-up" size={20} color="#d2691e" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Display Selected Sizes */}
+            {selectedSizes.length > 0 && (
+              <View style={{ marginTop: 10, alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                  Selected Sizes: {selectedSizes.join(', ')}
+                </Text>
+              </View>
+            )}
 
             {/* Pricing Table with Logic */}
             {(() => {
+              const totalQuantity = calculateOverallTotalQuantity();
               let pricePerPcs = 0;
 
               if (PPQ?.length > 0) {
                 for (let i = 0; i < PPQ.length; i++) {
                   const { minQty, maxQty, pricePerUnit } = PPQ[i];
                   if (maxQty) {
-                    if (quantity >= minQty && quantity <= maxQty) {
+                    if (totalQuantity >= minQty && totalQuantity <= maxQty) {
                       pricePerPcs = pricePerUnit;
                       break;
                     }
                   } else {
-                    if (quantity >= minQty) {
+                    if (totalQuantity >= minQty) {
                       pricePerPcs = pricePerUnit;
                       break;
                     }
@@ -299,7 +426,7 @@ const PartnerProductDetail = () => {
                 }
               }
 
-              const totalPrice = quantity * pricePerPcs;
+              const totalPrice = totalQuantity * pricePerPcs;
 
               return (
                 <>
@@ -321,7 +448,7 @@ const PartnerProductDetail = () => {
                       paddingHorizontal: 10,
                       marginTop: 5,
                     }}>
-                    <Text>{quantity}</Text>
+                    <Text>{totalQuantity}</Text>
                     <Text>₹{pricePerPcs}</Text>
                     <Text>₹{totalPrice}</Text>
                   </View>
@@ -391,21 +518,40 @@ const PartnerProductDetail = () => {
               return;
             }
 
-            // Construct the orderDetails array
-            const orderDetails = imagesByColor.map((colorObj) => ({
-              color: colorObj.color,
-              sizeAndQuantity: colorObj.sizes.map((sizeObj) => ({
-                size: sizeObj.size,
-                quantity: sizeObj.quantity || 1,
-                skuId: sizeObj.skuId,
-              })),
-            }));
+            // Construct the orderDetails array based on all colors, sizes, and quantities
+            const orderDetails = availableColors
+              .map(colorObj => {
+                const color = colorObj.color;
+                const colorMatch = imagesByColor.find(c => c.color === color);
+                if (!colorMatch) return null;
+
+                const sizeAndQuantity = colorMatch.sizes
+                  .map(sizeObj => ({
+                    size: sizeObj.size,
+                    quantity: quantities[color]?.[sizeObj.size] || 0,
+                    skuId: sizeObj.skuId || '',
+                  }))
+                  .filter(sizeObj => sizeObj.quantity > 0);
+
+                if (sizeAndQuantity.length === 0) return null;
+
+                return {
+                  color,
+                  sizeAndQuantity,
+                };
+              })
+              .filter(detail => detail !== null);
+
+            if (orderDetails.length === 0) {
+              alert('Please select at least one size and set a quantity greater than 0.');
+              return;
+            }
 
             // Calculate totalQuantity and totalPrice
             const totalQuantity = orderDetails.reduce(
-              (total, colorObj) =>
+              (total, detail) =>
                 total +
-                colorObj.sizeAndQuantity.reduce(
+                detail.sizeAndQuantity.reduce(
                   (subTotal, sizeObj) => subTotal + sizeObj.quantity,
                   0
                 ),
@@ -421,7 +567,7 @@ const PartnerProductDetail = () => {
               totalPrice,
             };
 
-            console.log(' Cart Payload:', payload);
+            console.log('Cart Payload:', payload);
 
             try {
               const response = await fetch('http://10.0.2.2:4000/api/partner/cart/create', {
@@ -435,7 +581,7 @@ const PartnerProductDetail = () => {
 
               const data = await response.json();
 
-              console.log(' Cart API Response:', data);
+              console.log('Cart API Response:', data);
 
               if (response.ok) {
                 alert('Added to cart successfully.');
@@ -444,7 +590,7 @@ const PartnerProductDetail = () => {
                 alert(data.message || 'Failed to add to cart.');
               }
             } catch (error) {
-              console.error(' Cart API Error:', error);
+              console.error('Cart API Error:', error);
               alert('Something went wrong while adding to cart.');
             }
           }}
@@ -507,9 +653,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   colorBox: {
-    width: 40, // Rectangular shape
+    width: 40,
     height: 30,
-    borderRadius: 5, // Slight border radius (set to 0 for sharp corners)
+    borderRadius: 5,
     borderWidth: 2,
     borderColor: '#ccc',
     marginRight: 10,
@@ -518,12 +664,12 @@ const styles = StyleSheet.create({
   },
   selectedColorBox: {
     borderWidth: 3,
-    borderColor: '#d2691e', // Highlight color for selected box
+    borderColor: '#d2691e',
   },
   quantityColorBox: {
-    width: 40, // Rectangular shape
+    width: 40,
     height: 30,
-    borderRadius: 5, // Slight border radius (set to 0 for sharp corners)
+    borderRadius: 5,
     borderWidth: 2,
     borderColor: '#d2691e',
     marginHorizontal: 5,
@@ -586,6 +732,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginTop: 10,
+    justifyContent: 'center',
   },
   sizeBox: {
     paddingHorizontal: 10,
@@ -595,6 +742,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     marginBottom: 5,
+  },
+  selectedSizeBox: {
+    borderColor: '#d2691e',
+    backgroundColor: '#ffe5cc',
   },
   sizeBoxText: {
     fontSize: 14,

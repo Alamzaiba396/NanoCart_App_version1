@@ -14,33 +14,33 @@ import RazorpayCheckout from "react-native-razorpay";
 
 //   navigate to partnerorderconfirmation
 
-//   const handlePayment = () => {
-//     const options = {
-//       key: "rzp_test_1DP5mmOlF5G5ag", // 🔸 Razorpay test key
-//       amount: 100 * 100, // ₹100 converted to paise
-//       currency: "INR",
-//       name: "Demo App",
-//       description: "Test Razorpay Interface",
-//       prefill: {
-//         name: "John Doe",
-//         email: "johndoe@example.com",
-//         contact: "9876543210",
-//       },
-//       theme: { color: "#F37254" },
-//     };
+  const handlePayment = () => {
+    const options = {
+      key: "rzp_test_1DP5mmOlF5G5ag", //  Razorpay test key
+      amount: 100 * 100, // ₹100 converted to paise
+      currency: "INR",
+      name: "Demo App",
+      description: "Test Razorpay Interface",
+      prefill: {
+        name: "John Doe",
+        email: "johndoe@example.com",
+        contact: "9876543210",
+      },
+      theme: { color: "#F37254" },
+    };
 
-//     setLoading(true);
+    setLoading(true);
 
-//     RazorpayCheckout.open(options)
-//       .then((data) => {
-//         Alert.alert("Success", `Payment ID: ${data.razorpay_payment_id}`);
-//         setLoading(false);
-//       })
-//       .catch((error) => {
-//         Alert.alert("Failed", `Error: ${error.description}`);
-//         setLoading(false);
-//       });
-//   };
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        Alert.alert("Success", `Payment ID: ${data.razorpay_payment_id}`);
+        setLoading(false);
+      })
+      .catch((error) => {
+        Alert.alert("Failed", `Error: ${error.description}`);
+        setLoading(false);
+      });
+  };
 
   return (
     <View style={styles.container}>
