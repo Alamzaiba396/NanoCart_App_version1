@@ -21,7 +21,7 @@ import PartnerAccordionItem from '../Components/PartnerAccordionItem';
 
 const { width } = Dimensions.get('window');
 
- const PartnerProductDetail = () => {
+const PartnerProductDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -30,18 +30,24 @@ const { width } = Dimensions.get('window');
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [selectedColorImages, setSelectedColorImages] = useState([]);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [sizes, setSizes] = useState([]);
   const [quantity, setQuantity] = useState(0);
-  const selectedPrice = PPQ?.[0]?.pricePerUnit || 0;
+  const [availableColors, setAvailableColors] = useState([]); // State for colors from API
+  const selectedPrice = product?.PPQ?.[0]?.pricePerUnit || 0;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         const res = await fetch(`http://10.0.2.2:4000/api/itemDetails/${itemId}`);
         const json = await res.json();
+        console.log('Product Details Response:', json);
         if (json.data && json.data.length > 0) {
           const productData = json.data[0];
+          console.log('Product Dataaaaaaa:', productData);
           setProduct(productData);
+          // Set the colors from the API response
+          setAvailableColors(json.colors || []);
           if (productData.imagesByColor?.length > 0) {
             setSelectedColorImages(productData.imagesByColor[0].images);
             setSizes(productData.imagesByColor[0].sizes || []);
@@ -54,7 +60,7 @@ const { width } = Dimensions.get('window');
       }
     };
 
-    fetchProductDetails(); 
+    fetchProductDetails();
   }, [itemId]);
 
   if (loading) {
@@ -65,7 +71,7 @@ const { width } = Dimensions.get('window');
     return <Text style={{ textAlign: 'center', marginTop: 50 }}>No product found</Text>;
   }
 
-  const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure,PPQ,deliveryPincode } = product;
+  const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure, PPQ, deliveryPincode } = product;
 
   const handleAddToWishlist = async () => {
     console.log('Wishlist button pressed');
@@ -126,6 +132,7 @@ const { width } = Dimensions.get('window');
       Alert.alert('Error', 'Something went wrong while adding to wishlist');
     }
   };
+
   return (
     <View style={styles.container}>
       <PartnerHeader />
@@ -153,16 +160,23 @@ const { width } = Dimensions.get('window');
 
         {/* Color Buttons */}
         <View style={styles.colors}>
-          {imagesByColor.map((colorObj, idx) => (
+          {availableColors.map((colorObj, idx) => (
             <TouchableOpacity
               key={idx}
-              style={[styles.colorBox]}
+              style={[
+                styles.colorBox,
+                { backgroundColor: colorObj.hexCode }, // Use hexCode from API
+                selectedColorIndex === idx && styles.selectedColorBox, // Highlight selected color
+              ]}
               onPress={() => {
-                setSelectedColorImages(colorObj.images);
-                setSizes(colorObj.sizes);
-              }}>
-              <Text style={{ fontSize: 10 }}>{colorObj.color}</Text>
-            </TouchableOpacity>
+                setSelectedColorIndex(idx);
+                const colorMatch = imagesByColor.find((c) => c.color === colorObj.color);
+                if (colorMatch) {
+                  setSelectedColorImages(colorMatch.images);
+                  setSizes(colorMatch.sizes || []);
+                }
+              }}
+            />
           ))}
         </View>
 
@@ -202,118 +216,120 @@ const { width } = Dimensions.get('window');
           <Text>{About}</Text>
         </PartnerAccordionItem>
 
+        {PPQ?.length > 0 && (
+          <PartnerAccordionItem title="Pricing Per Quantity">
+            {PPQ.map((ppqItem, index) => (
+              <View
+                key={index}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingVertical: 8,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#ddd',
+                }}>
+                <Text style={{ fontSize: 14, color: '#333' }}>
+                  {ppqItem.maxQty
+                    ? `${ppqItem.minQty}-${ppqItem.maxQty} pcs`
+                    : `> ${ppqItem.minQty} pcs`}
+                </Text>
+                <Text style={{ fontSize: 14, color: 'orange', fontWeight: 'bold' }}>
+                  ₹{ppqItem.pricePerUnit}.00
+                </Text>
+              </View>
+            ))}
+          </PartnerAccordionItem>
+        )}
 
-{PPQ?.length > 0 && (
-  <PartnerAccordionItem title="Pricing Per Quantity">
-    {PPQ.map((ppqItem, index) => (
-      <View
-        key={index}
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          paddingVertical: 8,
-          borderBottomWidth: 1,
-          borderBottomColor: '#ddd',
-        }}>
-        <Text style={{ fontSize: 14, color: '#333' }}>
-          {ppqItem.maxQty
-            ? `${ppqItem.minQty}-${ppqItem.maxQty} pcs`
-            : `> ${ppqItem.minQty} pcs`}
-        </Text>
-        <Text style={{ fontSize: 14, color: 'orange', fontWeight: 'bold' }}>
-          ₹{ppqItem.pricePerUnit}.00
-        </Text>
-      </View>
-    ))}
-  </PartnerAccordionItem>
-)}
+        <PartnerAccordionItem title="Choose Items">
+          <View style={{ paddingVertical: 10 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>Select Quantity</Text>
 
+            {/* Color Buttons Row */}
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
+              {availableColors.map((colorObj, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.quantityColorBox,
+                    { backgroundColor: colorObj.hexCode }, // Use hexCode from API
+                    selectedColorIndex === idx && styles.selectedColorBox,
+                  ]}
+                  onPress={() => {
+                    setSelectedColorIndex(idx);
+                    const colorMatch = imagesByColor.find((c) => c.color === colorObj.color);
+                    if (colorMatch) {
+                      setSelectedColorImages(colorMatch.images);
+                      setSizes(colorMatch.sizes || []);
+                    }
+                  }}
+                />
+              ))}
+            </View>
 
-<PartnerAccordionItem title="Choose Items">
-  <View style={{ paddingVertical: 10 }}>
-    <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>Select Quantity</Text>
+            {/* Quantity Selector */}
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => setQuantity(prev => Math.max(0, prev - 1))}>
+                <Feather name="chevron-down" size={24} color="#d2691e" />
+              </TouchableOpacity>
+              <Text style={{ marginHorizontal: 20, fontSize: 18 }}>{quantity}</Text>
+              <TouchableOpacity onPress={() => setQuantity(prev => prev + 1)}>
+                <Feather name="chevron-up" size={24} color="#d2691e" />
+              </TouchableOpacity>
+            </View>
 
-    {/* Color Buttons Row */}
-    <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
-      {imagesByColor.map((colorObj, idx) => (
-        <TouchableOpacity
-          key={idx}
-          style={{
-            width: 30,
-            height: 30,
-            backgroundColor: colorObj.hex || 'gray',
-            borderWidth: 2,
-            borderColor: '#d2691e',
-            marginHorizontal: 5,
-          }}
-        />
-      ))}
-    </View>
+            {/* Pricing Table with Logic */}
+            {(() => {
+              let pricePerPcs = 0;
 
-    {/* Quantity Selector */}
-    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity onPress={() => setQuantity(prev => Math.max(0, prev - 1))}>
-        <Feather name="chevron-down" size={24} color="#d2691e" />
-      </TouchableOpacity>
-      <Text style={{ marginHorizontal: 20, fontSize: 18 }}>{quantity}</Text>
-      <TouchableOpacity onPress={() => setQuantity(prev => prev + 1)}>
-        <Feather name="chevron-up" size={24} color="#d2691e" />
-      </TouchableOpacity>
-    </View>
+              if (PPQ?.length > 0) {
+                for (let i = 0; i < PPQ.length; i++) {
+                  const { minQty, maxQty, pricePerUnit } = PPQ[i];
+                  if (maxQty) {
+                    if (quantity >= minQty && quantity <= maxQty) {
+                      pricePerPcs = pricePerUnit;
+                      break;
+                    }
+                  } else {
+                    if (quantity >= minQty) {
+                      pricePerPcs = pricePerUnit;
+                      break;
+                    }
+                  }
+                }
+              }
 
-    {/* Pricing Table with Logic */}
-    {(() => {
-      let pricePerPcs = 0;
+              const totalPrice = quantity * pricePerPcs;
 
-      if (PPQ?.length > 0) {
-        for (let i = 0; i < PPQ.length; i++) {
-          const { minQty, maxQty, pricePerUnit } = PPQ[i];
-          if (maxQty) {
-            if (quantity >= minQty && quantity <= maxQty) {
-              pricePerPcs = pricePerUnit;
-              break;
-            }
-          } else {
-            if (quantity >= minQty) {
-              pricePerPcs = pricePerUnit;
-              break;
-            }
-          }
-        }
-      }
-
-      const totalPrice = quantity * pricePerPcs;
-
-      return (
-        <>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 15,
-              paddingHorizontal: 10,
-            }}>
-            <Text>Total Qty.</Text>
-            <Text>Price / Pcs</Text>
-            <Text>Total Price</Text>
+              return (
+                <>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 15,
+                      paddingHorizontal: 10,
+                    }}>
+                    <Text>Total Qty.</Text>
+                    <Text>Price / Pcs</Text>
+                    <Text>Total Price</Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 10,
+                      marginTop: 5,
+                    }}>
+                    <Text>{quantity}</Text>
+                    <Text>₹{pricePerPcs}</Text>
+                    <Text>₹{totalPrice}</Text>
+                  </View>
+                </>
+              );
+            })()}
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingHorizontal: 10,
-              marginTop: 5,
-            }}>
-            <Text>{quantity}</Text>
-            <Text>₹{pricePerPcs}</Text>
-            <Text>₹{totalPrice}</Text>
-          </View>
-        </>
-      );
-    })()}
-  </View>
-</PartnerAccordionItem>
-
+        </PartnerAccordionItem>
 
         <PartnerAccordionItem title="Return Policies">
           <Text>{returnPolicy}</Text>
@@ -332,117 +348,110 @@ const { width } = Dimensions.get('window');
         </PartnerAccordionItem>
 
         {deliveryPincode?.length > 0 && (
-  <PartnerAccordionItem title="Delivery Available At">
-    <Text style={{ marginBottom: 5 }}>We deliver to the following pin codes:</Text>
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-      {deliveryPincode.map((pincode, index) => (
-        <View
-          key={index}
-          style={{
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            backgroundColor: '#eee',
-            borderRadius: 5,
-            marginRight: 8,
-            marginBottom: 8,
-          }}>
-          <Text>{pincode}</Text>
-        </View>
-      ))}
-    </View>
-  </PartnerAccordionItem>
-)}
-
+          <PartnerAccordionItem title="Delivery Available At">
+            <Text style={{ marginBottom: 5 }}>We deliver to the following pin codes:</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              {deliveryPincode.map((pincode, index) => (
+                <View
+                  key={index}
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    backgroundColor: '#eee',
+                    borderRadius: 5,
+                    marginRight: 8,
+                    marginBottom: 8,
+                  }}>
+                  <Text>{pincode}</Text>
+                </View>
+              ))}
+            </View>
+          </PartnerAccordionItem>
+        )}
       </ScrollView>
 
       {/* Sticky Buttons at Bottom */}
       <View style={styles.bottomButtons}>
- 
-<TouchableOpacity
-  style={styles.wishlistButton}
-  onPress={ handleAddToWishlist}>
-  
-  <Icon name="heart-o" size={18} color="black" />
-  <Text style={styles.wishlistText}>WISHLIST</Text>
-  </TouchableOpacity>
+        <TouchableOpacity style={styles.wishlistButton} onPress={handleAddToWishlist}>
+          <Icon name="heart-o" size={18} color="black" />
+          <Text style={styles.wishlistText}>WISHLIST</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={async () => {
+            console.log('🛒 Add to cart button pressed');
 
-  <TouchableOpacity
-  style={styles.cartButton}
-  onPress={async () => {
-    console.log('🛒 Add to cart button pressed');
+            if (!token) {
+              console.warn(' No token found. Redirecting to login.');
+              navigation.navigate('Login', {
+                fromScreen: 'ProductDetail',
+                itemId: product.itemId._id,
+              });
+              return;
+            }
 
-    if (!token) {
-      console.warn(' No token found. Redirecting to login.');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
+            // Construct the orderDetails array
+            const orderDetails = imagesByColor.map((colorObj) => ({
+              color: colorObj.color,
+              sizeAndQuantity: colorObj.sizes.map((sizeObj) => ({
+                size: sizeObj.size,
+                quantity: sizeObj.quantity || 1,
+                skuId: sizeObj.skuId,
+              })),
+            }));
 
-    // Construct the orderDetails array
-    const orderDetails = imagesByColor.map((colorObj) => ({
-      color: colorObj.color,
-      sizeAndQuantity: colorObj.sizes.map((sizeObj) => ({
-        size: sizeObj.size,
-        quantity: sizeObj.quantity || 1, // Default quantity to 1 if not provided
-        skuId: sizeObj.skuId,
-      })),
-    }));
+            // Calculate totalQuantity and totalPrice
+            const totalQuantity = orderDetails.reduce(
+              (total, colorObj) =>
+                total +
+                colorObj.sizeAndQuantity.reduce(
+                  (subTotal, sizeObj) => subTotal + sizeObj.quantity,
+                  0
+                ),
+              0
+            );
 
-    // Calculate totalQuantity and totalPrice
-    const totalQuantity = orderDetails.reduce(
-      (total, colorObj) =>
-        total +
-        colorObj.sizeAndQuantity.reduce(
-          (subTotal, sizeObj) => subTotal + sizeObj.quantity,
-          0
-        ),
-      0
-    );
+            const totalPrice = totalQuantity * selectedPrice;
 
-    const totalPrice = totalQuantity * selectedPrice; // Assuming `selectedPrice` is defined
+            const payload = {
+              itemId: product.itemId._id,
+              orderDetails,
+              totalQuantity,
+              totalPrice,
+            };
 
-    const payload = {
-      itemId: product.itemId._id,
-      orderDetails,
-      totalQuantity,
-      totalPrice,
-    };
+            console.log(' Cart Payload:', payload);
 
-    console.log(' Cart Payload:', payload);
+            try {
+              const response = await fetch('http://10.0.2.2:4000/api/partner/cart/create', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
 
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/partner/cart/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+              const data = await response.json();
 
-      const data = await response.json();
+              console.log(' Cart API Response:', data);
 
-      console.log(' Cart API Response:', data);
-
-      if (response.ok) {
-        alert('Added to cart successfully.');
-        navigation.navigate('PartnerCart'); // 
-      } else {
-        alert(data.message || 'Failed to add to cart.');
-      }
-    } catch (error) {
-      console.error(' Cart API Error:', error);
-      alert('Something went wrong while adding to cart.');
-    }
-  }}
->
-  <Feather name="shopping-cart" size={18} color="#fff" />
-  <Text style={styles.cartText}>ADD TO CART</Text>
-</TouchableOpacity>
-
+              if (response.ok) {
+                alert('Added to cart successfully.');
+                navigation.navigate('PartnerCart');
+              } else {
+                alert(data.message || 'Failed to add to cart.');
+              }
+            } catch (error) {
+              console.error(' Cart API Error:', error);
+              alert('Something went wrong while adding to cart.');
+            }
+          }}
+        >
+          <Feather name="shopping-cart" size={18} color="#fff" />
+          <Text style={styles.cartText}>ADD TO CART</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -498,12 +507,28 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   colorBox: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginRight: 10,
-    borderWidth: 1,
+    width: 40, // Rectangular shape
+    height: 30,
+    borderRadius: 5, // Slight border radius (set to 0 for sharp corners)
+    borderWidth: 2,
     borderColor: '#ccc',
-    borderRadius: 5,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedColorBox: {
+    borderWidth: 3,
+    borderColor: '#d2691e', // Highlight color for selected box
+  },
+  quantityColorBox: {
+    width: 40, // Rectangular shape
+    height: 30,
+    borderRadius: 5, // Slight border radius (set to 0 for sharp corners)
+    borderWidth: 2,
+    borderColor: '#d2691e',
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   details: {
     marginVertical: 10,
