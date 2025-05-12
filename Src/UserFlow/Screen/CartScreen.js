@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
+  View, Text, TextInput, Image, TouchableOpacity, ScrollView, StyleSheet,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,11 +11,12 @@ const CartScreen = ({ navigation }) => {
   const authToken = useSelector(state => state.auth.token);
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
-    const token = useSelector(state => state.auth.token);
+  const token = useSelector(state => state.auth.token);
+  const [showCoupon, setShowCoupon] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
 
-    const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-
-    const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ total quantity
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ total quantity
 
   useEffect(() => {
     if (authToken) {
@@ -135,31 +136,30 @@ const CartScreen = ({ navigation }) => {
   const couponDiscount = 200;
   const gstAmount = (discountedTotal * 0.135).toFixed(1);
 
-
   const [invoiceData, setInvoiceData] = useState({
     gst: '0%',
     coupon_discount: '₹0',
     shipping_charge: '₹0',
     total_amount: '₹0',
   });
-  
+
   useEffect(() => {
     fetchInvoiceData();
   }, []);
-  
+
   const fetchInvoiceData = async () => {
     try {
       const res = await fetch('http://10.0.2.2:4000/api/invoice');
       const json = await res.json();
-  
+
       if (res.ok && json.success) {
         const invoice = json.data[0].invoice;
         const getValue = (key) =>
           invoice.find((item) => item.key === key)?.values || '₹0';
-  
+
         setInvoiceData({
           gst: getValue('gst'),
-          coupon_discount: getValue('coupon_discount'),
+          coupon_discount: getValue('coupon discount'),
           shipping_charge: getValue('shipping_charge'),
           total_amount: getValue('total_amount'),
         });
@@ -170,45 +170,43 @@ const CartScreen = ({ navigation }) => {
       console.error('🔥 Error fetching invoice:', err.message);
     }
   };
-  
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-        
         {/* Header */}
-       <View style={styles.header}>
-             <View style={styles.headerLeft}>
-               <TouchableOpacity onPress={() => navigation.navigate('UserHome')}>
-                 <Image source={require('../../assets/Images/Back.png')} style={styles.backIcon} />
-               </TouchableOpacity>
-               <Text style={styles.headerTitle}>Cart</Text>
-             </View>
-     
-             <View style={styles.rightIcons}>
-               <TouchableOpacity>
-                 <Image source={require('../../assets/Images/SearchIcon.png')} style={styles.icon} />
-               </TouchableOpacity>
-     
-               <TouchableOpacity
-                 style={styles.cartIconWrapper}
-                 onPress={() => {
-                   if (token) {
-                     navigation.navigate('Cart');
-                   } else {
-                     setShowLoginModal(true);
-                   }
-                 }}
-               >
-                 <Image source={require('../../assets/Images/Cart.png')} style={styles.icon} />
-                 {cartCount > 0 && (
-                   <View style={styles.cartBadge}>
-                     <Text style={styles.cartBadgeText}>{cartCount}</Text>
-                   </View>
-                 )}
-               </TouchableOpacity>
-             </View>
-           </View>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={() => navigation.navigate('UserHome')}>
+              <Image source={require('../../assets/Images/Back.png')} style={styles.backIcon} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Cart</Text>
+          </View>
+
+          <View style={styles.rightIcons}>
+            <TouchableOpacity>
+              <Image source={require('../../assets/Images/SearchIcon.png')} style={styles.icon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cartIconWrapper}
+              onPress={() => {
+                if (token) {
+                  navigation.navigate('Cart');
+                } else {
+                  setIsModalVisible(true);
+                }
+              }}
+            >
+              <Image source={require('../../assets/Images/Cart.png')} style={styles.icon} />
+              {cartCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cartCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Progress bar */}
         <View style={styles.progress}>
@@ -219,9 +217,22 @@ const CartScreen = ({ navigation }) => {
           <Text style={styles.inactiveStep}>● PAYMENT</Text>
         </View>
 
-        {/* Cart Items */}
+        {/* Cart Items or Empty Cart Message */}
         {cartItems.length === 0 ? (
-          <Text style={{ textAlign: 'center', marginTop: 20 }}>No items in cart.</Text>
+          <View style={styles.emptyCartContainer}>
+            <Image
+              source={require('../../assets/Images/Cart.png')} // Reuse the cart icon or replace with an empty cart image
+              style={styles.emptyCartImage}
+            />
+            <Text style={styles.emptyCartTitle}>Your Cart is Empty</Text>
+            <Text style={styles.emptyCartSubtitle}>Add items to start shopping</Text>
+            <TouchableOpacity
+              style={styles.continueShoppingBtn}
+              onPress={() => navigation.navigate('UserHome')}
+            >
+              <Text style={styles.continueShoppingText}>Continue Shopping</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           cartItems.map((cartItem, index) => (
             <View key={index} style={styles.card}>
@@ -265,50 +276,77 @@ const CartScreen = ({ navigation }) => {
           ))
         )}
 
-        {/* Apply Coupon */}
-        <TouchableOpacity style={styles.couponBar}>
-          <Text>Apply Coupon</Text>
-          <Entypo name="chevron-down" size={20} color="#000" />
-        </TouchableOpacity>
+        {/* Apply Coupon (Only shown if cart has items) */}
+        {cartItems.length > 0 && (
+          <>
+            <TouchableOpacity
+              style={styles.couponBar}
+              onPress={() => setShowCoupon(prev => !prev)}
+            >
+              <Text style={{ fontWeight: 'bold' }}>Apply Coupon</Text>
+              <Entypo name={showCoupon ? 'chevron-up' : 'chevron-down'} size={20} color="#000" />
+            </TouchableOpacity>
 
-        {/* Price Details */}
-        <View style={styles.priceCard}>
-  <Text style={styles.priceTitle}>Price Details ({cartItems.length} items)</Text>
-  <View style={styles.priceRow}>
-    <Text>Cart Total</Text>
-    <Text>₹{cartTotalMRP}</Text>
-  </View>
-  <View style={styles.priceRow}>
-    <Text>Discounted Price</Text>
-    <Text>₹{discountedTotal}</Text>
-  </View>
-  <View style={styles.priceRow}>
-    <Text style={styles.orange}>Coupon Discount</Text>
-    <Text style={styles.orange}>- {invoiceData.coupon_discount}</Text>
-  </View>
-  <View style={styles.priceRow}>
-    <Text>GST</Text>
-    <Text>{invoiceData.gst}</Text>
-  </View>
-  <View style={styles.priceRow}>
-    <Text>Shipping Charges</Text>
-    <Text>{invoiceData.shipping_charge}</Text>
-  </View>
-  <View style={[styles.priceRow, { borderTopWidth: 1, paddingTop: 8, marginTop: 6, borderColor: '#ddd' }]}>
-    <Text style={{ fontWeight: 'bold' }}>Total Payable</Text>
-    <Text style={{ fontWeight: 'bold' }}>{invoiceData.total_amount}</Text>
-  </View>
-</View>
+            {showCoupon && (
+              <View style={styles.couponAccordion}>
+                <View style={styles.couponInputRow}>
+                  <TextInput
+                    placeholder="Enter your Coupon code"
+                    style={styles.couponInput}
+                    value={couponCode}
+                    onChangeText={setCouponCode}
+                  />
+                  <TouchableOpacity style={styles.couponApplyBtn}>
+                    <Text style={styles.couponApplyText}>APPLY</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </>
+        )}
 
+        {/* Price Details (Only shown if cart has items) */}
+        {cartItems.length > 0 && (
+          <View style={styles.priceCard}>
+            <Text style={styles.priceTitle}>Price Details ({cartItems.length} items)</Text>
+            <View style={styles.priceRow}>
+              <Text>Cart Total</Text>
+              <Text>₹{cartTotalMRP}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text>Discounted Price</Text>
+              <Text>₹{discountedTotal}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text style={styles.orange}>Coupon Discount</Text>
+              <Text style={styles.orange}>- {invoiceData.coupon_discount}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text>GST</Text>
+              <Text>{invoiceData.gst}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text>Shipping Charges</Text>
+              <Text>{invoiceData.shipping_charge}</Text>
+            </View>
+            <View style={[styles.priceRow, { borderTopWidth: 1, paddingTop: 8, marginTop: 6, borderColor: '#ddd' }]}>
+              <Text style={{ fontWeight: 'bold' }}>Total Payable</Text>
+              <Text style={{ fontWeight: 'bold' }}>{invoiceData.total_amount}</Text>
+            </View>
+          </View>
+        )}
 
-        {/* Continue Button */}
-        <TouchableOpacity style={styles.continueBtn} onPress={handleContinuePress}>
-          <Text style={styles.continueText}>CONTINUE</Text>
-        </TouchableOpacity>
+        {/* Continue Button (Only shown if cart has items) */}
+        {cartItems.length > 0 && (
+          <TouchableOpacity style={styles.continueBtn} onPress={handleContinuePress}>
+            <Text style={styles.continueText}>CONTINUE</Text>
+          </TouchableOpacity>
+        )}
 
-        {/* Payment Method */}
-        <Text style={styles.paymentRow}>Payment Method <Text style={{ fontWeight: 'bold' }}>UPI</Text></Text>
-
+        {/* Payment Method (Only shown if cart has items) */}
+        {cartItems.length > 0 && (
+          <Text style={styles.paymentRow}>Payment Method <Text style={{ fontWeight: 'bold' }}>UPI</Text></Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -316,17 +354,36 @@ const CartScreen = ({ navigation }) => {
 
 export default CartScreen;
 
-
 const styles = StyleSheet.create({
   icon: { width: 20, height: 20, resizeMode: 'contain' },
   header: {
-    marginTop: 15,
+    marginTop: 2,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 32,
+    backgroundColor: '#fff',
+    elevation: 2,
     justifyContent: 'space-between',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold' },
+  headerLeft: { flexDirection: 'row', alignItems: 'center' },
+  backIcon: { width: 24, height: 24, resizeMode: 'contain', marginRight: 8 },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: '#000', textTransform: 'uppercase' },
+  rightIcons: { flexDirection: 'row', alignItems: 'center' },
+  icon: { width: 22, height: 22, resizeMode: 'contain', marginHorizontal: 8 },
+  cartIconWrapper: { position: 'relative' },
+  cartBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: 'orange',
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    minWidth: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cartBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   progress: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -389,56 +446,79 @@ const styles = StyleSheet.create({
   },
   continueText: { color: '#fff', textAlign: 'center', fontWeight: 'bold', fontSize: 16 },
   paymentRow: { textAlign: 'center', marginVertical: 10 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '85%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center' },
-  closeIcon: { position: 'absolute', top: 10, right: 10 },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginTop: 10 },
-  modalMessage: { fontSize: 16, textAlign: 'center', marginVertical: 15 },
-  modalButton: { backgroundColor: '#f37022', paddingVertical: 12, paddingHorizontal: 25, borderRadius: 5, marginVertical: 10 },
-  modalButtonText: { color: '#fff', fontWeight: 'bold' },
-  modalHelpText: { color: '#888', fontSize: 13, marginTop: 5 },
-  badge: {
-    position: 'absolute',
-    top: -5,
-    right: -8,
-    backgroundColor: '#F36F25',
-    borderRadius: 10,
-    width: 18,
-    height: 18,
+  // New styles for empty cart view
+  emptyCartContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 100,
   },
-  badgeText: {
-    color: '#fff',
-    fontSize: 10,
+  emptyCartImage: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
+    tintColor: '#ccc', // Optional: make the icon gray to indicate emptiness
+  },
+  emptyCartTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
+    marginTop: 20,
   },
-  header: {
-    marginTop: 2,
+  emptyCartSubtitle: {
+    fontSize: 16,
+    color: '#777',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  continueShoppingBtn: {
+    backgroundColor: '#f37022',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+  },
+  continueShoppingText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  couponAccordion: {
+    marginHorizontal: 15,
+    backgroundColor: '#fdf0e7',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderTopWidth: 0,
+    marginTop: -10,
+    marginBottom: 12,
+  },
+  couponInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  couponInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    paddingVertical: 32,
+    fontSize: 14,
     backgroundColor: '#fff',
-    elevation: 2,
-    justifyContent: 'space-between',
   },
-  headerLeft: { flexDirection: 'row', alignItems: 'center' },
-  backIcon: { width: 24, height: 24, resizeMode: 'contain', marginRight: 8 },
-  headerTitle: { fontSize: 16, fontWeight: 'bold', color: '#000', textTransform: 'uppercase' },
-  rightIcons: { flexDirection: 'row', alignItems: 'center' },
-  icon: { width: 22, height: 22, resizeMode: 'contain', marginHorizontal: 8 },
-  cartIconWrapper: { position: 'relative' },
-  cartBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    backgroundColor: 'orange',
-    borderRadius: 8,
-    paddingHorizontal: 4,
-    minWidth: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+  couponApplyBtn: {
+    backgroundColor: '#f37022',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginLeft: 10,
+    borderRadius: 4,
   },
-  cartBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+  couponApplyText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
 });

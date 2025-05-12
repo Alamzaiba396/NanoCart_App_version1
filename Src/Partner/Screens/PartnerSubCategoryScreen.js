@@ -13,6 +13,7 @@ import Header from '../../UserFlow/Component/Header';
 import FilterComponent from '../../UserFlow/Component/FilterComponent';
 import SortComponent from '../../UserFlow/Component/SortComponent';
 import PartnerSubCategoryItem from '../Components/PartnerSubCategoryItem';
+import PartnerHeader from '../Components/PartnerHeader';
 
 const PartnerSubCategoryScreen = ({navigation, route}) => {
   const {subCategory} = route.params;
@@ -77,7 +78,7 @@ const PartnerSubCategoryScreen = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <PartnerHeader />
       {loading ? (
         <ActivityIndicator
           size="large"

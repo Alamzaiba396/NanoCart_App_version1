@@ -1,4 +1,5 @@
-import { useRoute, useNavigation } from '@react-navigation/native';import Header from '../Component/Header';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import Header from '../Component/Header';
 import AccordionItem from '../Component/AccordionItem';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
@@ -19,7 +20,7 @@ import { addToWishlist } from '../../redux/reducers/wishlistSlice';
 
 const { width } = Dimensions.get('window');
 
- const ProductDetail = () => {
+const ProductDetailScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -29,6 +30,8 @@ const { width } = Dimensions.get('window');
   const [product, setProduct] = useState(null);
   const [selectedColorImages, setSelectedColorImages] = useState([]);
   const [sizes, setSizes] = useState([]);
+  const [selectedColor, setSelectedColor] = useState(null); // Track selected color
+  const [selectedSize, setSelectedSize] = useState(null);  // Track selected size
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -41,6 +44,8 @@ const { width } = Dimensions.get('window');
           if (productData.imagesByColor?.length > 0) {
             setSelectedColorImages(productData.imagesByColor[0].images);
             setSizes(productData.imagesByColor[0].sizes || []);
+            setSelectedColor(productData.imagesByColor[0].color); // Default to first color
+            setSelectedSize(productData.imagesByColor[0].sizes?.[0]?.size || null); // Default to first size
           }
         }
       } catch (err) {
@@ -50,7 +55,7 @@ const { width } = Dimensions.get('window');
       }
     };
 
-    fetchProductDetails(); 
+    fetchProductDetails();
   }, [itemId]);
 
   if (loading) {
@@ -62,6 +67,17 @@ const { width } = Dimensions.get('window');
   }
 
   const { itemId: itemInfo, imagesByColor, sizeChart, deliveryDescription, returnPolicy, About, isSize, howToMeasure } = product;
+
+  const handleColorSelect = (colorObj) => {
+    setSelectedColor(colorObj.color);
+    setSelectedColorImages(colorObj.images);
+    setSizes(colorObj.sizes);
+    setSelectedSize(colorObj.sizes?.[0]?.size || null); // Reset size selection when color changes
+  };
+
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
+  };
 
   return (
     <View style={styles.container}>
@@ -93,13 +109,13 @@ const { width } = Dimensions.get('window');
           {imagesByColor.map((colorObj, idx) => (
             <TouchableOpacity
               key={idx}
-              style={[styles.colorBox]}
-              onPress={() => {
-                setSelectedColorImages(colorObj.images);
-                setSizes(colorObj.sizes);
-              }}>
-              <Text style={{ fontSize: 10 }}>{colorObj.color}</Text>
-            </TouchableOpacity>
+              style={[
+                styles.colorBox,
+                { backgroundColor: colorObj.hexCode },
+                selectedColor === colorObj.color ? styles.selectedColorBox : {},
+              ]}
+              onPress={() => handleColorSelect(colorObj)}
+            />
           ))}
         </View>
 
@@ -126,8 +142,22 @@ const { width } = Dimensions.get('window');
             </View>
             <View style={styles.sizeOptions}>
               {sizes.map((sz, idx) => (
-                <TouchableOpacity key={idx} style={styles.sizeBox}>
-                  <Text style={styles.sizeBoxText}>{sz.size}</Text>
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.sizeBox,
+                    selectedSize === sz.size ? styles.selectedSizeBox : {},
+                  ]}
+                  onPress={() => handleSizeSelect(sz.size)}
+                >
+                  <Text
+                    style={[
+                      styles.sizeBoxText,
+                      selectedSize === sz.size ? styles.selectedSizeBoxText : {},
+                    ]}
+                  >
+                    {sz.size}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -158,152 +188,136 @@ const { width } = Dimensions.get('window');
 
       {/* Sticky Buttons at Bottom */}
       <View style={styles.bottomButtons}>
- 
-<TouchableOpacity
-  style={styles.wishlistButton}
-  onPress={async () => {
-    console.log(' Wishlist button pressed');
+        <TouchableOpacity
+          style={styles.wishlistButton}
+          onPress={async () => {
+            console.log('Wishlist button pressed');
 
-    if (!token) {
-      console.log(' No token found. Redirecting to login screen...');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
+            if (!token) {
+              console.log('No token found. Redirecting to login screen...');
+              navigation.navigate('Login', {
+                fromScreen: 'ProductDetail',
+                itemId: product.itemId._id,
+              });
+              return;
+            }
 
-    console.log(' Token found:', token);
+            console.log('Token found:', token);
 
-    const colorObj = imagesByColor.find(colorSet =>
-      colorSet.images.some(img => img.url === selectedColorImages[0]?.url)
-    );
-    const selectedColor = colorObj?.color || 'Black';
+            const payload = {
+              itemId: product.itemId._id,
+              color: selectedColor || 'Black',
+            };
 
-    console.log(' Selected color:', selectedColor);
-    console.log(' Item ID:', product.itemId._id);
+            console.log('Request Payload:', payload);
 
-    const payload = {
-      itemId: product.itemId._id,
-      color: selectedColor,
-    };
+            try {
+              const response = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
 
-    console.log(' Request Payload:', payload);
+              console.log('Wishlist API Response Status:', response.status);
 
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/userwishlist/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+              const data = await response.json();
+              console.log('Wishlist API Response Data:', data);
 
-      console.log(' Wishlist API Response Status:', response.status);
+              if (response.ok) {
+                console.log('Item added to wishlist successfully.');
+                dispatch(addToWishlist(data));
+                console.log('Wishlist item dispatched to Redux:', data);
+                alert('Added to wishlist');
+                navigation.navigate('Wishlist');
+              } else {
+                console.warn('Wishlist API error:', data.message);
+                alert(data.message || 'Failed to add to wishlist');
+              }
+            } catch (err) {
+              console.error('Network/API Error while adding to wishlist:', err);
+              alert('Something went wrong while adding to wishlist');
+            }
+          }}
+        >
+          <Icon name="heart-o" size={18} color="black" />
+          <Text style={styles.wishlistText}>WISHLIST</Text>
+        </TouchableOpacity>
 
-      const data = await response.json();
-      console.log(' Wishlist API Response Data:', data);
+        <TouchableOpacity
+          style={styles.cartButton}
+          onPress={async () => {
+            console.log('🛒 Add to cart button pressed');
 
-      if (response.ok) {
-        console.log(' Item added to wishlist successfully.');
-        dispatch(addToWishlist(data));
-        console.log(' Wishlist item dispatched to Redux:', data);
-        alert('Added to wishlist');
-        navigation.navigate('Wishlist');
-      } else {
-        console.warn(' Wishlist API error:', data.message);
-        alert(data.message || 'Failed to add to wishlist');
-      }
-    } catch (err) {screen
-      console.error(' Network/API Error while adding to wishlist:', err);
-      alert('Something went wrong while adding to wishlist');
-    }
-  }}>
-  <Icon name="heart-o" size={18} color="black" />
-  <Text style={styles.wishlistText}>WISHLIST</Text>
-</TouchableOpacity>
+            if (!token) {
+              console.warn('No token found. Redirecting to login.');
+              navigation.navigate('Login', {
+                fromScreen: 'ProductDetail',
+                itemId: product.itemId._id,
+              });
+              return;
+            }
 
-<TouchableOpacity
-  style={styles.cartButton}
-  onPress={async () => {
-    console.log('🛒 Add to cart button pressed');
+            if (!selectedSize) {
+              alert('Please select a size.');
+              return;
+            }
 
-    if (!token) {
-      console.warn(' No token found. Redirecting to login.');
-      navigation.navigate('Login', {
-        fromScreen: 'ProductDetail',
-        itemId: product.itemId._id,
-      });
-      return;
-    }
+            const selectedColorObj = imagesByColor.find(colorObj => colorObj.color === selectedColor);
+            const selectedSizeObj = selectedColorObj?.sizes?.find(sz => sz.size === selectedSize);
 
-    const selectedColorObj = imagesByColor.find(colorObj =>
-      colorObj.images.some(img => img.url === selectedColorImages[0]?.url)
-    );
+            if (!selectedSizeObj) {
+              alert('Selected size is not available for this color.');
+              return;
+            }
 
-    const selectedColor = selectedColorObj?.color || 'Black';
+            const payload = {
+              itemId: product.itemId._id,
+              quantity: 1,
+              size: selectedSize,
+              color: selectedColor || 'Black',
+              skuId: selectedSizeObj.skuId,
+            };
 
-    console.log(' Selected Color:', selectedColor);
+            console.log('Cart Payload:', payload);
 
-    // Get selected size (you can make user select size dynamically later)
-    const selectedSizeObj = selectedColorObj?.sizes?.[0]; // take first available size for now
-    const selectedSize = selectedSizeObj?.size || '';
-    const skuId = selectedSizeObj?.skuId || '';
+            try {
+              const response = await fetch('http://10.0.2.2:4000/api/usercart/create', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
 
-    console.log(' Selected Size:', selectedSize);
-    console.log(' Selected SKU ID:', skuId);
+              const data = await response.json();
 
-    if (!selectedSize || !skuId) {
-      alert('Please select a valid size.');
-      return;
-    }
+              console.log('Cart API Response:', data);
 
-    const payload = {
-      itemId: product.itemId._id,
-      quantity: 1, // default 1
-      size: selectedSize,
-      color: selectedColor,
-      skuId: skuId,
-    };
-
-    console.log(' Cart Payload:', payload);
-
-    try {
-      const response = await fetch('http://10.0.2.2:4000/api/usercart/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      console.log(' Cart API Response:', data);
-
-      if (response.ok) {
-        alert('Added to cart successfully.');
-        navigation.navigate('Cart'); // ✅ navigate to cart
-      } else {
-        alert(data.message || 'Failed to add to cart.');
-      }
-    } catch (error) {
-      console.error(' Cart API Error:', error);
-      alert('Something went wrong while adding to cart.');
-    }
-  }}>
-  <Feather name="shopping-cart" size={18} color="#fff" />
-  <Text style={styles.cartText}>ADD TO CART</Text>
-</TouchableOpacity>
-
+              if (response.ok) {
+                alert('Added to cart successfully.');
+                navigation.navigate('Cart');
+              } else {
+                alert(data.message || 'Failed to add to cart.');
+              }
+            } catch (error) {
+              console.error('Cart API Error:', error);
+              alert('Something went wrong while adding to cart.');
+            }
+          }}
+        >
+          <Feather name="shopping-cart" size={18} color="#fff" />
+          <Text style={styles.cartText}>ADD TO CART</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default ProductDetail;
+export default ProductDetailScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -353,12 +367,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   colorBox: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    width: 40,
+    height: 30,
     marginRight: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+  },
+  selectedColorBox: {
+    borderWidth: 2,
+    borderColor: '#D2691E',
   },
   details: {
     marginVertical: 10,
@@ -426,8 +443,16 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 5,
   },
+  selectedSizeBox: {
+    backgroundColor: '#D2691E',
+    borderColor: '#D2691E',
+  },
   sizeBoxText: {
     fontSize: 14,
+  },
+  selectedSizeBoxText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   bottomButtons: {
     position: 'absolute',
@@ -475,7 +500,3 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
-
-
-
-

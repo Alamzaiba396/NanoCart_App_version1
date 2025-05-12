@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,25 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 
-const orderItems = [
-  {
-    id: '1',
-    name: 'MAAHI Winter Hoodie',
-    category: 'Unisex Collections',
-    date: 'Placed on 20th Feb, 11:24 pm',
-    image: require('../../assets/Images/Carosuel1.png'),
-    status: 'Confirmed',
-  },
-  {
-    id: '2',
-    name: 'MAAHI Popular: Georgette Saree',
-    category: "Women's Party Wear",
-    date: 'Placed on 20th Feb, 11:24 pm',
-    image: require('../../assets/Images/Carosuel1.png'),
-    status: 'Confirmed',
-  },
-];
-
+// Recommendations data (static for now)
 const recommendations = [
   {
     id: 'a',
@@ -41,7 +23,57 @@ const recommendations = [
   },
 ];
 
-const OrderConfirmationScreen = ({ navigation }) => {
+const OrderConfirmationScreen = ({ route, navigation }) => {
+  // Extract order data from navigation params
+  const { orderData } = route.params; // Assuming the entire API response is passed as 'orderData'
+
+  // State to hold order details
+  const [orderDetails, setOrderDetails] = useState([]);
+  const [orderId, setOrderId] = useState('');
+  const [orderStatus, setOrderStatus] = useState('');
+  const [createdAt, setCreatedAt] = useState('');
+
+  // Format the date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+  };
+
+  // Process the API response when the component mounts
+  useEffect(() => {
+    if (orderData) {
+      // Extract orderId
+      setOrderId(orderData.data.orderId);
+
+      // Extract orderDetails and map the required fields
+      const details = orderData.data.orderDetails.map((item) => ({
+        id: item._id,
+        name: item.itemId.name,
+        description: item.itemId.description, // Used as category in the UI
+        image: { uri: item.itemId.image }, // Use URI for remote image
+        date: `Placed on ${formatDate(orderData.data.createdAt)}`,
+        status: orderData.data.orderStatus,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+      }));
+      setOrderDetails(details);
+
+      // Extract orderStatus
+      setOrderStatus(orderData.data.orderStatus);
+
+      // Extract createdAt
+      setCreatedAt(formatDate(orderData.data.createdAt));
+    }
+  }, [orderData]);
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
@@ -61,17 +93,17 @@ const OrderConfirmationScreen = ({ navigation }) => {
           We've received your order and will contact you as soon as your package is shipped. You can
           find your purchase information below.
         </Text>
-        <Text style={styles.orderId}>Order ID: #134589785</Text>
+        <Text style={styles.orderId}>Order ID: {orderId}</Text>
       </View>
 
       {/* Product List */}
       <View style={styles.productsBox}>
-        {orderItems.map((item) => (
+        {orderDetails.map((item) => (
           <TouchableOpacity key={item.id} style={styles.productRow}>
             <Image source={item.image} style={styles.productImage} />
             <View style={styles.productInfo}>
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.category}>{item.category}</Text>
+              <Text style={styles.category}>{item.description}</Text>
               <Text style={styles.date}>{item.date}</Text>
               <Text style={styles.status}>● {item.status}</Text>
             </View>
@@ -81,7 +113,7 @@ const OrderConfirmationScreen = ({ navigation }) => {
       </View>
 
       {/* View Orders */}
-      <TouchableOpacity onPress={()=>navigation.navigate('OrderHistory')} style={styles.viewOrderBtn}>
+      <TouchableOpacity onPress={() => navigation.navigate('OrderHistory')} style={styles.viewOrderBtn}>
         <Text style={styles.viewOrderText}>VIEW ORDERS</Text>
       </TouchableOpacity>
 

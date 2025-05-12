@@ -20,8 +20,7 @@ const PartnerCartScreen = ({ navigation }) => {
   const [walletAmount, setWalletAmount] = useState('');
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [colorHexMap, setColorHexMap] = useState({});
-  const [invoiceData, setInvoiceData] = useState([]); // State for invoice data
+  const [colorHexMap, setColorHexMap] = useState({}); // Map color to hexCode
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
@@ -35,6 +34,7 @@ const PartnerCartScreen = ({ navigation }) => {
         if (response.ok && data.success) {
           setCartItems(data.data.items);
 
+          // Fetch hexCodes for each item
           const hexMap = {};
           for (const item of data.data.items) {
             const res = await fetch(`http://10.0.2.2:4000/api/itemDetails/${item.itemId._id}`);
@@ -51,32 +51,11 @@ const PartnerCartScreen = ({ navigation }) => {
         }
       } catch (error) {
         console.error('Error fetching cart items:', error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    const fetchInvoiceData = async () => {
-      try {
-        const response = await fetch('http://10.0.2.2:4000/api/invoice', {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        if (response.ok && data.success) {
-          setInvoiceData(data.data[0]?.invoice || []);
-        } else {
-          console.error('Failed to fetch invoice data:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching invoice data:', error);
-      }
-    };
-
-    const fetchData = async () => {
-      await Promise.all([fetchCartItems(), fetchInvoiceData()]);
-      setLoading(false);
-    };
-
-    fetchData();
+    fetchCartItems();
   }, [token]);
 
   const toggleExpand = (index) => {
@@ -95,6 +74,7 @@ const PartnerCartScreen = ({ navigation }) => {
 
   const handleQuantityChange = async (itemId, color, size, newQuantity) => {
     try {
+      // Update local state first for immediate UI feedback
       setCartItems(prevItems =>
         prevItems.map(item => {
           if (item.itemId._id === itemId) {
@@ -118,6 +98,7 @@ const PartnerCartScreen = ({ navigation }) => {
         })
       );
 
+      // Call API to update cart
       const payload = {
         itemId,
         orderDetails: cartItems
@@ -145,6 +126,7 @@ const PartnerCartScreen = ({ navigation }) => {
       if (!response.ok) {
         console.error('Failed to update cart:', data.message);
         Alert.alert('Error', 'Failed to update the quantity.');
+        // Revert local state if API fails
         setCartItems(prevItems =>
           prevItems.map(item => {
             if (item.itemId._id === itemId) {
@@ -259,17 +241,6 @@ const PartnerCartScreen = ({ navigation }) => {
     0
   );
 
-  // Calculate adjustments from invoice data
-  let adjustedTotal = totalPrice;
-  invoiceData.forEach(item => {
-    const value = parseFloat(item.values) || 0;
-    if (item.key.toLowerCase().includes('discount')) {
-      adjustedTotal -= value; // Subtract discounts
-    } else {
-      adjustedTotal += value; // Add charges (GST, shipping, COD, etc.)
-    }
-  });
-
   return (
     <View style={styles.container}>
       <PartnerHeader />
@@ -288,6 +259,7 @@ const PartnerCartScreen = ({ navigation }) => {
 
           return (
             <View key={item._id} style={styles.card}>
+              {/* Cart Item Card */}
               <View style={styles.row}>
                 <Image source={{ uri: item.itemId.image }} style={styles.productImage} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
@@ -299,6 +271,7 @@ const PartnerCartScreen = ({ navigation }) => {
                 </View>
               </View>
 
+              {/* Check Order Details Accordion */}
               <TouchableOpacity onPress={() => toggleExpand(index)} style={styles.accordionToggle}>
                 <Text style={{ fontWeight: '600', fontSize: 15 }}>Check Order Details</Text>
                 <Icon name={expandedIndex === index ? 'chevron-up' : 'chevron-down'} size={18} />
@@ -306,8 +279,10 @@ const PartnerCartScreen = ({ navigation }) => {
 
               {expandedIndex === index && (
                 <View style={styles.accordionSection}>
+                  {/* Color and Details */}
                   {item.orderDetails.map((colorObj, i) => (
                     <View key={i}>
+                      {/* Color Display */}
                       <View style={styles.colorRow}>
                         <Text style={styles.colorLabel}>Color: {colorObj.color}</Text>
                         <View
@@ -318,6 +293,7 @@ const PartnerCartScreen = ({ navigation }) => {
                         />
                       </View>
 
+                      {/* Size and Quantity with Selector */}
                       {colorObj.sizeAndQuantity.map((sizeObj, j) => (
                         <View key={j} style={styles.sizeQtyRow}>
                           <Text style={styles.sizeLabel}>Size: {sizeObj.size}</Text>
@@ -353,6 +329,7 @@ const PartnerCartScreen = ({ navigation }) => {
                     </View>
                   ))}
 
+                  {/* Totals */}
                   <View style={styles.totalRow}>
                     <Text>Total Qty: {totalQty}</Text>
                     <Text>Price / Pcs: ₹{item.itemId.discountedPrice}</Text>
@@ -361,6 +338,7 @@ const PartnerCartScreen = ({ navigation }) => {
                 </View>
               )}
 
+              {/* Move to Wishlist and Remove Buttons (Inside the Card) */}
               <View style={styles.cardActions}>
                 <TouchableOpacity
                   onPress={() => handleMoveToWishlist(item)}
@@ -379,14 +357,14 @@ const PartnerCartScreen = ({ navigation }) => {
         {/* Apply Coupon Section */}
         <TouchableOpacity
           onPress={() => setCouponAccordionOpen(!couponAccordionOpen)}
-          style={styles.accordionToggleFullWidth}
+          style={styles.accordionToggle}
         >
           <Text style={styles.sectionTitle}>Apply Coupon</Text>
           <Icon name={couponAccordionOpen ? 'chevron-up' : 'chevron-down'} size={18} />
         </TouchableOpacity>
 
         {couponAccordionOpen && (
-          <View style={styles.accordionFullWidth}>
+          <View style={styles.accordion}>
             <View style={styles.row}>
               <TextInput
                 placeholder="Enter your Coupon code"
@@ -402,7 +380,7 @@ const PartnerCartScreen = ({ navigation }) => {
         )}
 
         {/* Wallet Section */}
-        <View style={styles.accordionFullWidth}>
+        <View style={styles.accordion}>
           <Text style={styles.sectionTitle}>Use Wallet</Text>
           <TextInput
             placeholder="₹"
@@ -415,7 +393,7 @@ const PartnerCartScreen = ({ navigation }) => {
         </View>
 
         {/* Price Details Section */}
-        <View style={styles.priceBoxFullWidth}>
+        <View style={styles.priceBox}>
           <Text style={styles.priceHeading}>Price Details</Text>
           <View style={styles.priceDetailRow}>
             <Text>Total Items</Text>
@@ -425,18 +403,13 @@ const PartnerCartScreen = ({ navigation }) => {
             <Text>Total Price</Text>
             <Text>₹{totalPrice.toFixed(2)}</Text>
           </View>
-          {invoiceData.map((item, index) => (
-            <View key={index} style={styles.priceDetailRow}>
-              <Text style={styles.capitalize}>{item.key}</Text>
-              <Text style={item.key.toLowerCase().includes('discount') ? { color: '#28a745' } : {}}>
-                {item.key.toLowerCase().includes('discount') ? '- ₹' : '₹'}
-                {parseFloat(item.values).toFixed(2)}
-              </Text>
-            </View>
-          ))}
+          <View style={styles.priceDetailRow}>
+            <Text>Discount</Text>
+            <Text style={{ color: '#28a745' }}>- ₹0.00</Text>
+          </View>
           <View style={[styles.priceDetailRow, { borderTopWidth: 1, borderTopColor: '#ccc', paddingTop: 8 }]}>
             <Text style={{ fontWeight: 'bold' }}>Grand Total</Text>
-            <Text style={{ fontWeight: 'bold' }}>₹{adjustedTotal.toFixed(2)}</Text>
+            <Text style={{ fontWeight: 'bold' }}>₹{totalPrice.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -446,6 +419,7 @@ const PartnerCartScreen = ({ navigation }) => {
         </Text>
       </ScrollView>
 
+      {/* Continue Button */}
       <TouchableOpacity onPress={handleContinue} style={styles.continueBtn}>
         <Text style={styles.continueText}>CONTINUE</Text>
       </TouchableOpacity>
@@ -477,14 +451,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  accordionToggleFullWidth: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
   },
@@ -558,15 +524,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  accordionFullWidth: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 0,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginVertical: 6,
-  },
+  // accordion: {
+  //   backgroundColor: 'red',
+  //   padding: 12,
+  //   borderRadius: 8,
+  //   borderWidth: 1,
+  //   borderColor: '#ccc',
+  //   marginHorizontal: 12,
+  //   marginVertical: 6,
+  // },
   input: {
     flex: 1,
     borderWidth: 1,
@@ -589,12 +555,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#666',
   },
-  priceBoxFullWidth: {
+  priceBox: {
     backgroundColor: '#fff3e8',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: 12,
+    marginHorizontal: 12,
     marginVertical: 6,
-    borderRadius: 0,
+    borderRadius: 8,
   },
   priceHeading: {
     fontWeight: 'bold',
@@ -604,9 +570,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 4,
-  },
-  capitalize: {
-    textTransform: 'capitalize',
   },
   paymentMethod: {
     paddingHorizontal: 16,
