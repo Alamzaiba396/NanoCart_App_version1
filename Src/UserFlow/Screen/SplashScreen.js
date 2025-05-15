@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Image, StyleSheet, StatusBar, Animated } from "react-native";
 import { useSelector } from "react-redux";
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation }) => { 
   const fadeAnim = new Animated.Value(0);
   const token = useSelector(state => state.auth.token);
   const role = useSelector(state => state.auth.role);
@@ -48,4 +48,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SplashScreen;
+export default SplashScreen; 
